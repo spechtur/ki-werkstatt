@@ -1,0 +1,2199 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KI-Werkstatt</title>
+<style>
+  :root{
+    --bg:#c7d200;
+    --fg:#1c1c1c;
+    --sans:'DejaVu Sans','Verdana','Tahoma',sans-serif;
+    --serif:'DejaVu Serif',Georgia,'Times New Roman',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--fg);font-family:var(--sans);
+    transition:background .45s ease;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:3.2vh 5vw 8vh}
+  [hidden]{display:none!important}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    font:800 clamp(.9rem,1.3vw,1.2rem) var(--sans);
+    text-transform:uppercase;letter-spacing:.08em;
+    padding:.75em 1.5em;border:.15em solid var(--fg);border-radius:.5em;
+    background:var(--fg);color:var(--bg);cursor:pointer;
+    transition:transform .15s ease,opacity .2s ease;
+    text-decoration:none;display:inline-block;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent;color:var(--fg)}
+  .btn.small{font-size:.85rem;padding:.55em 1.1em}
+  .btn:focus-visible,.tile:focus-visible{outline:.22em solid var(--fg);outline-offset:.2em}
+  .btn.done{background:var(--fg);color:var(--bg)}
+
+  /* ---------- Kopf ---------- */
+  #home{padding-top:4vh}
+  .site-foot{margin-top:7vh;padding-top:1.2rem;border-top:.12rem solid var(--fg);font-size:.82rem;line-height:1.6;opacity:.8;max-width:46em}
+  .site-foot a{color:inherit;font-weight:700}
+  .kicker{font-weight:800;text-transform:uppercase;letter-spacing:.2em;font-size:clamp(.85rem,1.3vw,1.15rem);opacity:.85}
+  .title{
+    font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:1;
+    font-size:clamp(2.6rem,9vw,7.2rem);
+    display:block;width:fit-content;max-width:100%;
+    border-bottom:.07em solid var(--fg);padding-bottom:.06em;margin:1.6vh 0 3vh;
+    hyphens:manual;overflow-wrap:normal;word-break:normal;
+  }
+  .lead{font-family:var(--serif);font-style:italic;font-size:clamp(1.2rem,2.4vw,2rem);line-height:1.3;max-width:34em;text-wrap:balance}
+
+  .box a{color:inherit;font-weight:700}
+
+  /* ---------- Startseite ---------- */
+  .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.4rem;margin:5vh 0 3vh}
+  .box{border:.17rem solid var(--fg);border-radius:.8rem;padding:1.2rem 1.3rem}
+  .box h3{text-transform:uppercase;letter-spacing:.1em;font-size:.9rem;margin-bottom:.6rem}
+  .box p,.box li{line-height:1.5;font-size:1rem}
+  .box ul{padding-left:1.1rem}
+
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin:4vh 0 1.6rem}
+  .toolbar .lbl{font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.85rem;margin-right:.4rem}
+  .chip{
+    font:800 .9rem var(--sans);letter-spacing:.06em;padding:.5em 1em;border:.14em solid var(--fg);
+    border-radius:99px;background:transparent;color:var(--fg);cursor:pointer;
+  }
+  .chip[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+  .progress{margin-left:auto;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.85rem}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.3rem}
+  .tile{
+    display:flex;flex-direction:column;gap:.7rem;text-align:left;
+    border:.2rem solid var(--fg);border-radius:1rem;padding:1.2rem 1.3rem 1.3rem;
+    color:var(--fg);text-decoration:none;min-height:13rem;position:relative;
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .tile:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--fg)}
+  .tile .no{font-weight:800;font-size:.85rem;letter-spacing:.14em}
+  .tile .t{font-weight:800;text-transform:uppercase;font-size:1.45rem;line-height:1.08;letter-spacing:.01em;overflow-wrap:anywhere}
+  .tile .s{font-family:var(--serif);font-style:italic;line-height:1.3;font-size:1rem;flex:1}
+  .tile .meta{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase}
+  .lvl{letter-spacing:.2em;font-size:1.05rem}
+  .tile .tick{
+    position:absolute;top:.8rem;right:.9rem;width:1.9rem;height:1.9rem;border-radius:50%;
+    border:.15rem solid var(--fg);display:flex;align-items:center;justify-content:center;font-weight:800;
+  }
+  .tile.is-done .tick{background:var(--fg);color:#fff}
+
+  .legend{margin-top:3vh;font-size:.95rem;line-height:1.6}
+
+  /* ---------- Station ---------- */
+  .nav{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;margin-bottom:4vh}
+  .nav .sp{flex:1}
+  .steck{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    border:.2rem solid var(--fg);border-radius:1rem;margin:3vh 0 5vh;overflow:hidden;
+  }
+  .steck > div{padding:1rem 1.2rem;border-right:.2rem solid var(--fg);border-bottom:.2rem solid var(--fg);margin:0 -.2rem -.2rem 0}
+  .steck .k{font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.75rem;opacity:.8;margin-bottom:.35rem}
+  .steck .v{font-weight:700;line-height:1.35}
+  .steck .wide{grid-column:1/-1}
+  @media (max-width:700px){.steck{grid-template-columns:1fr 1fr}}
+
+  .sec{margin:0 0 4.4vh}
+  .sec > h2{
+    display:flex;align-items:center;gap:.8rem;
+    text-transform:uppercase;letter-spacing:.1em;font-size:1.15rem;font-weight:800;margin-bottom:1rem;
+  }
+  .sec > h2 .n{border:.15em solid var(--fg);border-radius:.4em;padding:.1em .5em;letter-spacing:.04em}
+  .sec p,.sec li{line-height:1.6;font-size:1.08rem;max-width:44em}
+  .sec p + p{margin-top:.8rem}
+  .sec ul,.sec ol{padding-left:1.3rem;margin-top:.4rem}
+  .sec li{margin-bottom:.45rem}
+  .sec .lede{font-family:var(--serif);font-style:italic;font-size:1.3rem;line-height:1.4}
+
+  .prompt{
+    background:var(--fg);color:#f6f6f6;border-radius:.8rem;padding:1.1rem 1.3rem;margin:1rem 0 .4rem;
+    font:500 .98rem/1.55 'DejaVu Sans Mono',Menlo,Consolas,monospace;white-space:pre-wrap;position:relative;
+    max-width:48em;
+  }
+  .prompt .lab{
+    display:block;font:800 .72rem var(--sans);letter-spacing:.16em;text-transform:uppercase;opacity:.7;margin-bottom:.5rem;
+  }
+  .copy{
+    position:absolute;top:.7rem;right:.7rem;font:800 .72rem var(--sans);letter-spacing:.1em;text-transform:uppercase;
+    padding:.45em .9em;border-radius:.4em;border:.12em solid #f6f6f6;background:transparent;color:#f6f6f6;cursor:pointer;
+  }
+  .copy:hover{background:#f6f6f6;color:var(--fg)}
+  .hint{border-left:.45rem solid var(--fg);padding:.2rem 0 .2rem 1rem;margin-top:1rem;max-width:44em;line-height:1.5}
+
+  .notes{width:100%;max-width:44em;min-height:6.5rem;border:.17rem solid var(--fg);border-radius:.7rem;background:rgba(255,255,255,.35);
+    font:500 1rem/1.5 var(--sans);color:var(--fg);padding:.8rem 1rem;resize:vertical}
+  .notes:focus{outline:.2em solid var(--fg);outline-offset:.15em;background:rgba(255,255,255,.55)}
+  .check{list-style:none;padding-left:0!important}
+  .check li{display:flex;gap:.7rem;align-items:flex-start}
+  .check input{width:1.3rem;height:1.3rem;margin-top:.2rem;accent-color:var(--fg);flex:none}
+
+  .footnav{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:6vh}
+  .footnav .sp{flex:1}
+
+
+  /* ---------- Stationen: Stufen und Schritte ---------- */
+  h1.title.compact{font-size:clamp(1.7rem,4vw,2.8rem)!important;margin:.8vh 0 2vh}
+  .stufen{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin:0 0 2.4vh}
+  .stufen .lbl,.steps .lbl{font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.85rem;margin-right:.4rem}
+  .chip.stufe{display:flex;flex-direction:column;align-items:flex-start;border-radius:.9rem;padding:.55em 1.1em;text-align:left}
+  .chip.stufe small{font-weight:500;letter-spacing:0;text-transform:none;font-size:.78rem;opacity:.85}
+  .steps{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.6vh 0 4vh;padding-top:1.2rem;border-top:.17rem solid var(--fg)}
+  .stepbtn{
+    font:800 .95rem var(--sans);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:.6rem;
+    padding:.6em 1.1em;border:.15em solid var(--fg);border-radius:.6em;background:transparent;color:var(--fg);cursor:pointer;
+  }
+  .stepbtn .sn{border:.12em solid currentColor;border-radius:50%;width:1.6rem;height:1.6rem;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem}
+  .stepbtn[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+  .pnav{display:flex;justify-content:space-between;gap:1rem;margin-top:3.4vh;flex-wrap:wrap}
+  .sub{text-transform:uppercase;letter-spacing:.12em;font-size:.9rem;font-weight:800;margin:2.4rem 0 .8rem}
+  .small{font-size:.9rem!important;opacity:.85;margin-top:.6rem}
+  .k2{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.8rem;margin:1.2rem 0 .3rem}
+
+  .schema{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin:.6rem 0 1rem}
+  .card{border:.17rem solid var(--fg);border-radius:.9rem;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.5rem;position:relative;background:rgba(255,255,255,.28)}
+  .card .no{font-weight:800;font-size:.8rem;opacity:.6;letter-spacing:.1em}
+  .card .ck{font-weight:800;text-transform:uppercase;letter-spacing:.03em;font-size:.98rem;overflow-wrap:anywhere}
+  .card .cq{font-family:var(--serif);font-style:italic;line-height:1.35;font-size:.98rem}
+  .card .ce{border-top:.12rem dashed var(--fg);padding-top:.55rem;font-size:.86rem;line-height:1.45}
+
+  .szen{border:.17rem solid var(--fg);border-radius:.9rem;padding:1rem 1.2rem;margin-bottom:2rem;background:rgba(255,255,255,.28);max-width:48em}
+  .szen .k{font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.75rem;margin-bottom:.5rem}
+  .szen p{max-width:none}
+  .flow{padding-left:1.2rem}
+  .flow > li{margin-bottom:2rem;max-width:48em}
+
+  .bau{display:grid;gap:.7rem;margin:1rem 0 .6rem;max-width:48em}
+  .bf{display:block}
+  .bl{display:flex;align-items:center;gap:.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.78rem;margin-bottom:.25rem}
+  .bn{border:.12em solid var(--fg);border-radius:50%;width:1.4rem;height:1.4rem;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem}
+  .bf textarea{width:100%;border:.15rem solid var(--fg);border-radius:.6rem;background:rgba(255,255,255,.4);color:var(--fg);padding:.55rem .8rem;font:500 .95rem/1.45 var(--sans);resize:vertical}
+  .bf textarea:focus{outline:.2em solid var(--fg);outline-offset:.1em;background:rgba(255,255,255,.65)}
+
+  details{max-width:48em;margin-top:.8rem}
+  summary{
+    cursor:pointer;font-weight:800;list-style:none;
+    display:inline-flex;align-items:center;gap:.7rem;
+    border:.15rem solid var(--fg);border-radius:.7rem;padding:.55em 1.1em .55em .7em;
+    background:rgba(255,255,255,.35);box-shadow:.2rem .2rem 0 var(--fg);
+    transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::marker{content:''}
+  summary::before{
+    content:'+';flex:none;width:1.6rem;height:1.6rem;border-radius:50%;
+    background:var(--fg);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;
+    font:800 1.15rem/1 var(--sans);padding-bottom:.1rem;
+  }
+  summary::after{
+    content:'Aufklappen';font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-left:.3rem;
+  }
+  summary:hover{transform:translate(-1px,-1px);box-shadow:.3rem .3rem 0 var(--fg);background:rgba(255,255,255,.55)}
+  summary:focus-visible{outline:.2em solid var(--fg);outline-offset:.2em}
+  details[open] > summary{box-shadow:none;transform:translate(.1rem,.1rem);background:var(--fg);color:var(--bg)}
+  details[open] > summary::before{content:'–';background:var(--bg);color:var(--fg)}
+  details[open] > summary::after{content:'Zuklappen'}
+  .ex{white-space:pre-wrap;background:rgba(255,255,255,.55);border:.15rem solid var(--fg);border-radius:.7rem;padding:1rem 1.2rem;margin-top:.7rem;font-family:var(--serif);line-height:1.55}
+  .wk{display:grid;gap:.9rem;margin-top:1.2rem}
+  .wcard{border:.17rem solid var(--fg);border-radius:.9rem;padding:.9rem 1.2rem;background:rgba(255,255,255,.28)}
+  .wcard summary{display:flex;width:100%;font-size:1.1rem;border:none;box-shadow:none;background:transparent;padding:.2rem 0}
+  .wcard summary::before{display:none}
+  .wcard summary::after{
+    content:'+';margin-left:auto;flex:none;width:1.9rem;height:1.9rem;border-radius:50%;opacity:1;
+    background:var(--fg);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;
+    font:800 1.3rem/1 var(--sans);letter-spacing:0;text-transform:none;padding-bottom:.1rem;
+  }
+  .wcard summary:hover{transform:none;box-shadow:none;background:transparent}
+  .wcard:hover{background:rgba(255,255,255,.45)}
+  .wcard[open] > summary{background:transparent;color:var(--fg);transform:none}
+  .wcard[open] > summary::after{content:'–';background:var(--fg);color:var(--bg)}
+  .wcard summary .no{border:.12em solid var(--fg);border-radius:50%;width:1.7rem;height:1.7rem;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;flex:none}
+  .wcard[open] summary{margin-bottom:.6rem}
+
+
+  /* ---------- Transfer, Verfeinern, Weiterdenken ---------- */
+  .denk{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;margin:1.2rem 0 .6rem}
+  .denk .card{background:rgba(255,255,255,.28)}
+  .denk .dt{line-height:1.5;font-size:.98rem}
+  .denk ul{padding-left:1.1rem;margin-top:.2rem}
+  .denk li{font-family:var(--serif);font-style:italic;font-size:.98rem;line-height:1.4;margin-bottom:.5rem}
+  details.mini{margin-top:.4rem}
+  details.mini > summary{font-size:.85rem;padding:.35em .9em .35em .55em;box-shadow:none;background:transparent}
+  details.mini > summary::before{width:1.25rem;height:1.25rem;font-size:.95rem}
+  details.mini > summary::after{font-size:.66rem}
+  details.mini[open] > summary{transform:none}
+  .hilfe{border-left:.35rem solid var(--fg);padding:.4rem 0 .1rem 1rem;margin-top:.6rem}
+  .hilfe li{font-size:.95rem;font-family:var(--serif);font-style:italic}
+  .check label{display:flex;gap:.7rem;align-items:flex-start;cursor:pointer}
+  .srow{margin-bottom:.9rem}
+  .srow .k{font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;margin-bottom:.2rem}
+  .srow p.pre,.transfer-item .own .ptxt{white-space:pre-wrap}
+  .transfer-item .own{margin:.3rem 0 1rem}
+
+  /* ---------- Transfer ---------- */
+  .transfer-item{border:.17rem solid var(--fg);border-radius:.8rem;padding:1rem 1.2rem;margin-bottom:1rem;max-width:46em}
+  .transfer-item .h{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.85rem;margin-bottom:.4rem}
+  .transfer-item p{white-space:pre-wrap;line-height:1.5}
+  .transfer-item .said{font-family:var(--serif);font-style:italic}
+  .transfer-item .mine{margin:.3rem 0 1rem;font-weight:700}
+  .spick{border-top:.14rem dashed var(--fg);padding-top:.8rem}
+  .spick .k{font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;margin-bottom:.4rem}
+  .spick .prompt{font-size:.85rem;padding:.8rem 1rem}
+  .transfer-item{break-inside:avoid}
+
+  .strip{display:flex;height:1.2vh;width:100vw;margin:8vh 0 -8vh calc(50% - 50vw)}
+  .strip span{flex:1}
+
+  @media (max-width:600px){
+    .steck > div{border-right:none}
+    .copy{position:static;display:block;margin-top:.8rem}
+  }
+  @media print{
+    .spick .prompt{background:none!important;color:var(--fg)!important;border:.12rem solid var(--fg)}
+    .nav,.footnav,.toolbar,.copy,.strip{display:none!important}
+    body{background:#fff!important}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- ================= STARTSEITE ================= -->
+<main id="home">
+  <div class="kicker">Lernwerkstatt für Lehrpersonen</div>
+  <h1 class="title">KI-Werkstatt</h1>
+  <p class="lead">Wähle deine Stationen, probiere aus, nimm mit. Alles ohne Anleitung von aussen – in deinem Tempo.</p>
+
+  <div class="how">
+    <div class="box">
+      <h3>So funktioniert's</h3>
+      <ul>
+        <li>Wähle eine Station, die dich interessiert.</li>
+        <li>Arbeite zu zweit oder zu dritt.</li>
+        <li>Jede Station hat sechs Schritte: Verstehen, Ausprobieren, Transfer, Verfeinern, Weiterdenken, Take-Home.</li>
+        <li>Wähle nach Interesse und Zeit: Du musst nicht alle Stationen machen.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Goldene Regel</h3>
+      <p><b>Nur fiktive Daten.</b> Keine echten Namen, keine echten Beobachtungen, keine Zeugnisinformationen. Die Musterbeispiele auf den Stationen sind erfunden.</p>
+    </div>
+    <div class="box">
+      <h3>Welches Tool?</h3>
+      <p>Alle Stationen funktionieren mit jedem Chatbot. Empfehlenswert:</p>
+      <ul>
+        <li><a href="https://duck.ai" target="_blank" rel="noopener">duck.ai</a></li>
+        <li><a href="https://lumo.proton.me" target="_blank" rel="noopener">lumo.proton.me</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="toolbar" role="group" aria-label="Level filtern">
+    <span class="lbl">Level</span>
+    <button class="chip" type="button" data-f="0" aria-pressed="true">Alle</button>
+    <button class="chip" type="button" data-f="1" aria-pressed="false">●○○ Einstieg</button>
+    <button class="chip" type="button" data-f="2" aria-pressed="false">●●○ Vertiefung</button>
+    <button class="chip" type="button" data-f="3" aria-pressed="false">●●● Profi</button>
+    <span class="progress" id="progress"></span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="legend"><b>Levels:</b> ●○○ Einstieg: ohne Vorwissen machbar. ●●○ Vertiefung: du hast schon Erfahrung mit KI. ●●● Profi: anspruchsvoll, braucht Urteilsvermögen und Diskussion.</p>
+
+  <div style="margin-top:4vh;display:flex;gap:.8rem;flex-wrap:wrap">
+    <a class="btn" href="#takehome">Mein Take-Home →</a>
+  </div>
+</main>
+
+<!-- ================= STATION ================= -->
+<article id="station" hidden></article>
+
+<!-- ================= TRANSFER ================= -->
+<section id="takehome" hidden>
+  <div class="nav">
+    <a class="btn ghost small" href="#">← Übersicht</a>
+  </div>
+  <div class="kicker">Zum Abschluss</div>
+  <h1 class="title">Mein Take-Home</h1>
+  <p class="lead">Mit welchem konkreten Anwendungsfall verlasse ich diesen Nachmittag?</p>
+  <div class="sec" style="margin-top:5vh">
+    <h2><span class="n">★</span>Ich werde KI verwenden, um …</h2>
+    <textarea class="notes" id="mainTransfer" placeholder="… in der kommenden Schulwoche …"></textarea>
+  </div>
+  <div class="sec">
+    <h2><span class="n">✎</span>Meine Notizen und Spickzettel</h2>
+    <div id="transferList"></div>
+  </div>
+  <div class="sec">
+    <h2><span class="n">⇩</span>Mitnehmen</h2>
+    <p>Deine Notizen liegen nur in diesem Browser und gehen verloren, wenn du ihn wechselst oder die Daten löschst. Speichere sie deshalb jetzt.</p>
+    <div class="footnav" style="margin-top:1rem">
+      <button class="btn" type="button" id="btnTxt">Als Textdatei speichern</button>
+      <button class="btn" type="button" id="btnCopy">In Zwischenablage kopieren</button>
+      <button class="btn ghost" type="button" onclick="window.print()">Drucken / Als PDF</button>
+    </div>
+  </div>
+  <div class="footnav">
+    <a class="btn ghost" href="#">Zurück zur Übersicht</a>
+  </div>
+</section>
+
+<footer class="site-foot">
+  KI-Werkstatt · Idee und Umsetzung: David Halser, Pädagogische Hochschule Graubünden (PHGR) ·
+  Lizenz: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.de" target="_blank" rel="noopener">CC BY-SA 4.0</a>
+  – teilen und anpassen ausdrücklich erwünscht, bitte mit Namensnennung und unter gleicher Lizenz.
+</footer>
+
+<div class="strip" id="strip"></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===== Hilfen ===== */
+  var $ = function(id){ return document.getElementById(id); };
+  var root = document.documentElement;
+  var LV = ['','●○○','●●○','●●●'];
+  var LVN = ['','Einstieg','Vertiefung','Profi'];
+
+  var store = {
+    get:function(k){ try{ return localStorage.getItem('kiw_'+k); }catch(e){ return null; } },
+    set:function(k,v){ try{ localStorage.setItem('kiw_'+k, v); }catch(e){} }
+  };
+  var DONE = {};
+  try{ DONE = JSON.parse(store.get('done')||'{}'); }catch(e){ DONE = {}; }
+  function saveDone(){ store.set('done', JSON.stringify(DONE)); }
+
+  function esc(s){
+    return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+  }
+  function theme(bg){ root.style.setProperty('--bg',bg); }
+
+  /* ===== Stationen ===== */
+  var S = [
+    { id:'prompting', title:'Prompting', bg:'#fbb900', level:1, min:'25–30', sub:'Vom knappen Auftrag zum guten Prompt – und dann im Dialog weiterarbeiten.',
+      mitnehmen:'Ein Grundschema, mit dem du aus jedem Auftrag einen brauchbaren Prompt machst, und Formulierungen für den Dialog.',
+      brauchst:'Ein KI-Tool deiner Wahl (z.B. duck.ai oder lumo.proton.me)',
+      hinfuehrung:'Wer mit KI arbeitet, schreibt ständig Prompts. Gute Prompts sparen später viel Überarbeitungszeit. Es braucht dafür keine 20 Tricks, sondern ein einfaches Grundschema und die Bereitschaft, nachzufragen.',
+      schema:[
+        {key:'rolle', k:'Rolle', q:'Wer soll die KI sein?'},
+        {key:'auftrag', k:'Auftrag', q:'Was genau soll entstehen?'},
+        {key:'kontext', k:'Kontext', q:'Für wen, in welcher Situation, mit welchem Vorwissen?'},
+        {key:'kriterien', k:'Kriterien', q:'Worauf kommt es an? Länge, Niveau, Sprache, Inhalt.'},
+        {key:'format', k:'Ausgabeformat', q:'In welcher Form soll das Ergebnis kommen?'}
+      ],
+      erklaert:[
+        'Der <b>erste Entwurf</b> ist selten das Endergebnis. Gute Resultate entstehen im Dialog: nachfragen, kürzen, anpassen.',
+        'Je mehr du <b>vorgibst</b>, desto weniger muss die KI raten. Du musst aber nicht alles in einem Prompt sagen.',
+        'Die KI kann sich irren und klingt trotzdem überzeugend. <b>Du</b> entscheidest, was du übernimmst.'
+      ],
+      stolper:[
+        '<b>Zu vage:</b> «Mach ein Arbeitsblatt.» Die KI muss alles erraten.',
+        '<b>Zu viel auf einmal:</b> fünf Aufträge in einem Prompt. Besser Schritt für Schritt.',
+        '<b>Wichtiges fehlt:</b> Stufe, Vorwissen, Sprache (z.B. Hochdeutsch, «ss» statt «ß»).',
+        '<b>Kein Nachfragen:</b> den ersten Entwurf ungeprüft übernehmen.'
+      ],
+      stufen:{
+        1:{ label:'Zyklus 1', sub:'Kindergarten bis 2. Klasse', thema:'Lesetext «Igel im Herbst»',
+          szenario:'Du möchtest für deine 2. Klasse einen kurzen Lesetext zum Thema «Igel im Herbst», passend für Kinder, die noch langsam lesen.',
+          bad:'Schreib was über Igel.',
+          bau:{
+            rolle:'Du bist eine erfahrene Lehrperson einer 2. Klasse in der Deutschschweiz.',
+            auftrag:'Schreibe einen kurzen Lesetext über den Igel im Herbst und drei Verständnisfragen dazu.',
+            kontext:'Die Kinder lesen noch langsam und stockend. Sie kennen die Wörter Blätter, Nest, Wurm und schlafen. Wir schreiben Hochdeutsch mit «ss» statt «ß».',
+            kriterien:'Höchstens 6 Sätze, höchstens 8 Wörter pro Satz, keine Nebensätze. Das Wort «Winterschlaf» wird im Text erklärt. Inhaltlich korrekt.',
+            format:'Zuerst der Text mit Titel, danach die drei Fragen nummeriert. Keine Emojis.'
+          },
+          beispiel:'Der Igel im Herbst\n\nEs wird kalt. Der Igel baut ein warmes Nest. Er frisst viele Würmer und Käfer. Dann wird er dick. Im Winter schläft er lange. Das nennt man Winterschlaf.\n\nFragen\n1. Was baut der Igel?\n2. Was frisst der Igel im Herbst?\n3. Wie heisst der lange Schlaf im Winter?',
+          pruef:['Höchstens 6 Sätze und 8 Wörter pro Satz? Zähle nach.','Ist «Winterschlaf» erklärt?','Stimmt es sachlich? Igel bauen Nester aus Laub und halten Winterschlaf.','Schweizer Schreibweise (ss statt ß)?'],
+          nachfragen:[
+            'Mach die Sätze noch kürzer und einfacher.',
+            'Schreibe eine zweite Version, in der das Wort «Winterschlaf» mit einem Alltagsbeispiel erklärt wird.',
+            'Ergänze eine vierte Frage für Kinder, die schneller fertig sind: «Warum braucht der Igel im Herbst viel Futter?»'
+          ]},
+        2:{ label:'Zyklus 2', sub:'3. bis 6. Klasse', thema:'Arbeitsblatt «Wasserkreislauf»',
+          szenario:'Du führst in deiner 5. Klasse das Thema «Wasserkreislauf» (NMG) ein und brauchst dafür ein Arbeitsblatt.',
+          bad:'Mach ein Arbeitsblatt zum Wasser.',
+          bau:{
+            rolle:'Du bist eine erfahrene Lehrperson einer 5. Klasse in der Deutschschweiz (Fach NMG).',
+            auftrag:'Erstelle ein Arbeitsblatt zum Wasserkreislauf.',
+            kontext:'Die Kinder kennen Regen, Nebel und Wolken, aber noch nicht die Fachbegriffe. Das Blatt dient der Einführung, Einzelarbeit, ca. 30 Minuten.',
+            kriterien:'Die Begriffe Verdunsten, Kondensieren, Niederschlag und Versickern verwenden und einfach erklären. Drei Aufgaben mit steigendem Anspruch. Sachlich korrekt.',
+            format:'Titel, Infotext (maximal 80 Wörter), Aufgaben 1 bis 3 mit Platz zum Schreiben, am Ende ein separates Lösungsblatt.'
+          },
+          beispiel:'Der Wasserkreislauf\n\nInfotext\nWasser verändert sich ständig. Die Sonne wärmt Seen und Meere. Das Wasser verdunstet und steigt als Wasserdampf auf. In der Höhe ist es kalt: Der Dampf kondensiert zu winzigen Tropfen, es entstehen Wolken. Fallen die Tropfen als Regen oder Schnee zu Boden, nennt man das Niederschlag. Ein Teil versickert im Boden, der Rest fliesst über Bäche und Flüsse zurück ins Meer.\n\nAufgabe 1: Begriffe zuordnen\nVerbinde Verdunsten, Kondensieren, Niederschlag und Versickern mit der passenden Erklärung.\n\nAufgabe 2: Lückentext\nDie ______ erwärmt das Wasser, es ______ und steigt auf …\n\nAufgabe 3: Nachdenken\nWarum regnet es im Gebirge oft mehr als im Flachland? Begründe in zwei Sätzen.\n\n(Lösungen auf separatem Blatt)',
+          pruef:['Sind die vier Fachbegriffe korrekt und kindgerecht erklärt?','Steigt der Anspruch von Aufgabe 1 bis 3?','Passt der Umfang zu 30 Minuten?','Stimmt das Lösungsblatt wirklich?'],
+          nachfragen:[
+            'Kürze den Infotext auf 60 Wörter.',
+            'Ergänze eine Aufgabe, bei der die Kinder den Kreislauf selbst zeichnen und beschriften.',
+            'Erstelle eine einfachere Version für Kinder mit Deutsch als Zweitsprache.'
+          ]},
+        3:{ label:'Zyklus 3', sub:'7. bis 9. Klasse', thema:'Lektionseinstieg «Prozentrechnen»',
+          szenario:'Du startest in deiner 8. Klasse in die Prozentrechnung und suchst einen Einstieg, der aus dem Alltag der Jugendlichen kommt.',
+          bad:'Gib mir etwas zu Prozent.',
+          bau:{
+            rolle:'Du bist eine erfahrene Mathematiklehrperson auf der Sekundarstufe I in der Deutschschweiz.',
+            auftrag:'Entwirf einen Lektionseinstieg zum Prozentrechnen mit einer Alltagssituation.',
+            kontext:'8. Klasse, mittleres Anforderungsniveau. Die Jugendlichen kennen den Begriff Prozent, haben aber Grundwert, Prozentwert und Prozentsatz noch nicht systematisch behandelt. Der Einstieg dauert ca. 10 Minuten.',
+            kriterien:'Situation aus der Lebenswelt Jugendlicher (Online-Shopping, Handyabo, Lohn), Preise in Schweizer Franken. Eine Denkfalle einbauen. Mit Lösungsweg für die Lehrperson.',
+            format:'Situation in 3 bis 4 Sätzen, danach zwei Impulsfragen für die Klasse, danach Lösung und typische Fehler in einer kurzen Liste.'
+          },
+          beispiel:'Situation\nIn einem Online-Shop kosten Kopfhörer Fr. 120.–. Aktuell gibt es 25 % Rabatt. Beim Bezahlen erhältst du zusätzlich einen Gutschein über 10 % auf den bereits reduzierten Preis. Dein Kollege sagt: «Das sind zusammen 35 % Rabatt!»\n\nImpulsfragen für die Klasse\n1. Hat dein Kollege recht? Schätze zuerst, rechne dann.\n2. Was ändert sich, wenn die 10 % zuerst abgezogen werden?\n\nFür mich (Lösung)\n120 × 0.75 = 90, danach 90 × 0.9 = 81. Ersparnis Fr. 39.– = 32.5 %, also weniger als 35 %. Die Reihenfolge spielt keine Rolle, das Ergebnis bleibt Fr. 81.–.\nTypische Fehler: Prozente einfach addieren; nicht beachten, dass sich der zweite Prozentsatz auf einen neuen Grundwert bezieht.',
+          pruef:['Rechne die Lösung selbst nach: Bei mehrstufigen Prozentrechnungen machen KI-Tools gern Fehler.','Passt die Situation zur Lebenswelt deiner Klasse?','Ist die Denkfalle fair und lösbar?','Entsprechen die typischen Fehler dem, was du aus dem Unterricht kennst?'],
+          nachfragen:[
+            'Mach die Situation realistischer: aktuelle Schweizer Preise und ein Beispiel, das Jugendliche wirklich betrifft.',
+            'Rechne die Lösung Schritt für Schritt nach und prüfe, ob sie stimmt.',
+            'Erfinde eine zweite Denkfalle, die in dieselbe Richtung geht.'
+          ]}
+      },
+      weiterKarten:[
+        {t:'Rückfragen zulassen', e:'Die KI klärt selbst, was ihr fehlt, statt zu raten.', p:'Bevor du antwortest: Stelle mir bis zu fünf Fragen, die du für ein gutes Ergebnis brauchst. Warte auf meine Antworten.'},
+        {t:'Beispiel mitgeben', e:'Ein Beispiel sagt mehr als zehn Eigenschaften. So trifft die KI deinen Stil.', p:'Hier ist ein Beispiel, so soll der Text klingen: [eigenes Beispiel einfügen]. Schreibe im gleichen Stil weiter.'},
+        {t:'Prompt verbessern lassen', e:'Die KI hilft dir, besser zu fragen.', p:'Hier ist mein Prompt: [Prompt einfügen]. Was fehlt? Formuliere ihn so um, dass das Ergebnis besser wird, und erkläre kurz, was du verändert hast.'},
+        {t:'Perspektive prüfen lassen', e:'Ein Blick von aussen zeigt Stolpersteine, die du selbst nicht mehr siehst.', p:'Prüfe deinen Entwurf aus der Sicht von [Kind mit Deutsch als Zweitsprache / skeptische Mutter / Fachkollegin]: Was ist unklar oder schwierig?'},
+        {t:'Als Vorlage sichern', e:'Gelungene Prompts lohnen sich zum Wiederverwenden. Lege dir eine eigene Sammlung an.', p:'Wandle meinen gelungenen Prompt in eine wiederverwendbare Vorlage mit [Platzhaltern] um, damit ich ihn für andere Themen und Klassen nutzen kann.'}
+      ],
+      transfer:'Welchen Auftrag aus deinem Alltag formulierst du in den nächsten Tagen mit dem Schema? Halte ihn fest.',
+      check:['du die fünf Teile des Schemas nennen kannst.','du nach dem ersten Entwurf mindestens einmal nachgefragt hast.','du weisst, welcher Teil des Prompts bei dir am meisten bewirkt hat.']
+    },
+
+    { id:'eltern', title:'Elternarbeit', bg:'#23b2c6', level:1, min:'15–20', sub:'Texte schreiben, vereinfachen, übersetzen – im passenden Ton.',
+      mitnehmen:'Einen Elternbrief in wenigen Minuten schreiben, in Leichte Sprache bringen und für fremdsprachige Eltern übersetzen lassen.',
+      brauchst:'Ein KI-Tool deiner Wahl',
+      hinfuehrung:'Elternbriefe, Einladungen und Rückmeldungen kosten viel Zeit, und der Ton muss stimmen. KI liefert dir einen Entwurf statt eines Endprodukts. Verschickt wird erst, was du geprüft hast.',
+      kartenTitel:'Vier Einsätze in der Elternarbeit',
+      karten:[
+        {k:'Entwerfen', q:'Aus Stichworten wird ein ganzer Brief.'},
+        {k:'Vereinfachen', q:'Leichte Sprache, kurze Sätze, klare Struktur.'},
+        {k:'Übersetzen', q:'Für Eltern, die wenig Deutsch sprechen.'},
+        {k:'Ton anpassen', q:'Warm, sachlich oder bestimmt, je nach Anlass.'}
+      ],
+      erklaert:[
+        'Gib <b>alle Fakten</b> mit (Datum, Zeit, Ort, Kosten, Abmeldung). Fehlt etwas, ergänzt die KI frei und erfindet Details.',
+        'Übersetzungen sind oft gut, aber nicht fehlerfrei. Lass bei wichtigen Inhalten <b>zurückübersetzen</b> oder frage eine Person, die die Sprache spricht.',
+        'Gib <b>keine echten Namen</b> und keine Angaben zu einzelnen Kindern oder Familien ein. Arbeite mit Platzhaltern wie [Name].'
+      ],
+      stolper:[
+        '<b>Fakten fehlen:</b> Die KI erfindet Uhrzeiten, Orte oder Regeln.',
+        '<b>Zu lang und floskelhaft:</b> Gib eine maximale Wortzahl vor.',
+        '<b>Falscher Ton:</b> «Sie» oder «Du», förmlich oder locker: Das legst du fest.',
+        '<b>Übersetzung ungeprüft verschickt.</b>'
+      ],
+      stufen:{
+        1:{ thema:'Elterninfo zum Waldtag', szenario:'Deine 1./2. Klasse geht auf einen Waldtag. Die Eltern brauchen eine kurze, gut verständliche Information.',
+          steps:[
+            {h:'Entwurf schreiben lassen.', d:'Kopiere den Prompt in dein KI-Tool. Die Fakten sind schon eingebaut.', lab:'Entwurf',
+             t:`Du bist Klassenlehrperson einer 1./2. Klasse in der Deutschschweiz. Schreibe einen kurzen, freundlichen Elternbrief (maximal 120 Wörter, einfache Sprache, Hochdeutsch mit «ss»).
+Anlass: Waldtag der Klasse.
+Fakten: Donnerstag, 14. Mai, 8.15 bis 11.45 Uhr. Treffpunkt: Parkplatz Waldhütte. Der Waldtag findet bei jedem Wetter statt. Mitbringen: wetterfeste Kleidung, lange Hosen (Zecken), Gummistiefel oder feste Schuhe, Znüni, Trinkflasche. Abmeldung bei Krankheit bis 7.30 Uhr an [Telefonnummer].
+Struktur: Was, Wann und Wo, Was mitbringen, Kontakt.`},
+            {h:'In Leichte Sprache bringen.', d:'Füge den Brief aus Schritt 1 ein.', lab:'Vereinfachen',
+             t:`Schreibe den folgenden Elternbrief in Leichter Sprache: kurze Sätze, bekannte Wörter, eine Information pro Satz, Wichtiges als Stichpunkte. Behalte alle Daten und Zeiten genau bei.
+
+[Brief aus Schritt 1 einfügen]`},
+            {h:'Übersetzen lassen.', d:'Wähle eine Sprache, die in deiner Klasse vorkommt.', lab:'Übersetzen',
+             t:`Übersetze den folgenden Brief ins [Albanische / Portugiesische / Türkische / Ukrainische / Tigrinya]. Verwende einfache, alltägliche Wörter. Gib danach eine kurze Rückübersetzung ins Deutsche, damit ich die Bedeutung prüfen kann.
+
+[Brief einfügen]`}
+          ],
+          beispiel:`Liebe Eltern
+
+Am Donnerstag, 14. Mai, gehen wir mit der Klasse in den Wald.
+
+Wann und wo?
+Von 8.15 bis 11.45 Uhr. Wir treffen uns beim Parkplatz Waldhütte. Der Waldtag findet bei jedem Wetter statt.
+
+Das braucht Ihr Kind:
+• wetterfeste Kleidung und lange Hosen (Zeckenschutz)
+• Gummistiefel oder feste Schuhe
+• Znüni und Trinkflasche
+
+Ist Ihr Kind krank? Bitte melden Sie es bis 7.30 Uhr unter [Telefonnummer] ab.
+
+Freundliche Grüsse
+[Name Lehrperson]`,
+          pruef:['Stimmen Datum, Zeit und Treffpunkt genau mit deinen Angaben überein?','Ist etwas dazugekommen, das du nicht angegeben hast?','Passt der Ton zu deiner Schule (Sie oder Du)?','Übersetzung: Stimmt die Rückübersetzung mit dem Original überein?'],
+          nachfragen:['Mach den Brief noch kürzer: höchstens 80 Wörter.','Schreibe eine Version mit «Du» statt «Sie».','Schreibe zusätzlich eine Kurznachricht von höchstens 3 Sätzen für den Klassenchat.']},
+        2:{ thema:'Elterninfo zum Klassenlager', szenario:'Deine 5./6. Klasse geht ins Klassenlager. Die Eltern brauchen alle Informationen zu Ablauf, Kosten und Regeln.',
+          steps:[
+            {h:'Entwurf schreiben lassen.', d:'Kopiere den Prompt in dein KI-Tool. Die Fakten sind schon eingebaut.', lab:'Entwurf',
+             t:`Du bist Klassenlehrperson einer 5./6. Klasse in der Deutschschweiz. Schreibe einen Elternbrief zum Klassenlager (maximal 180 Wörter, freundlich und klar, Hochdeutsch mit «ss», Anrede «Sie»).
+Fakten: Klassenlager Montag, 22., bis Freitag, 26. Juni im Lagerhaus Sonnenhalde (Toggenburg). Abfahrt Montag um 8.00 Uhr beim Schulhaus, Rückkehr Freitag ca. 16.00 Uhr am gleichen Ort. Kosten pro Kind: Fr. 180.– (den Rest übernimmt die Schulgemeinde). Handys und Smartwatches bleiben zu Hause. Anmeldetalon bis Freitag, 15. Mai. Elternabend dazu: Dienstag, 12. Mai, 19.30 Uhr.
+Struktur: Was, Wann, Kosten, Regeln, Anmeldung.`},
+            {h:'In Leichte Sprache bringen.', d:'Füge den Brief aus Schritt 1 ein.', lab:'Vereinfachen',
+             t:`Schreibe den folgenden Elternbrief in Leichter Sprache: kurze Sätze, bekannte Wörter, eine Information pro Satz, Wichtiges als Stichpunkte. Behalte alle Daten, Zeiten und Beträge genau bei.
+
+[Brief aus Schritt 1 einfügen]`},
+            {h:'Übersetzen lassen.', d:'Wähle eine Sprache, die in deiner Klasse vorkommt.', lab:'Übersetzen',
+             t:`Übersetze den folgenden Brief ins [Albanische / Portugiesische / Türkische / Ukrainische / Tigrinya]. Verwende einfache, alltägliche Wörter. Gib danach eine kurze Rückübersetzung ins Deutsche, damit ich die Bedeutung prüfen kann.
+
+[Brief einfügen]`}
+          ],
+          beispiel:`Liebe Eltern
+
+Unsere Klasse verbringt vom Montag, 22., bis Freitag, 26. Juni ein Klassenlager im Lagerhaus Sonnenhalde im Toggenburg. Wir freuen uns sehr darauf!
+
+Wann?
+Abfahrt: Montag, 8.00 Uhr, beim Schulhaus. Rückkehr: Freitag, ca. 16.00 Uhr, am gleichen Ort.
+
+Kosten
+Fr. 180.– pro Kind. Den Rest übernimmt die Schulgemeinde.
+
+Regeln
+Handys und Smartwatches bleiben zu Hause.
+
+Anmeldung
+Bitte geben Sie den Anmeldetalon bis Freitag, 15. Mai, ab. Weitere Informationen erhalten Sie am Elternabend am Dienstag, 12. Mai, um 19.30 Uhr.
+
+Freundliche Grüsse
+[Name Lehrperson]`,
+          pruef:['Stimmen alle Daten, Zeiten und der Betrag genau?','Ist etwas dazugekommen, das du nicht angegeben hast?','Ist die Handyregel verständlich und nicht zu schroff formuliert?','Übersetzung: Stimmt die Rückübersetzung mit dem Original überein?'],
+          nachfragen:['Ergänze eine Packliste mit höchstens 10 Punkten.','Formuliere den Abschnitt zur Handyregel wohlwollender und begründe die Regel kurz.','Welche Fragen könnten Eltern zu diesem Brief haben? Ergänze eine kurze FAQ.']},
+        3:{ thema:'Elterninfo zur Schnupperwoche', szenario:'Deine 8. Klasse hat eine Schnupperwoche. Die Eltern brauchen Informationen zu Ablauf, Fristen und Verantwortung.',
+          steps:[
+            {h:'Entwurf schreiben lassen.', d:'Kopiere den Prompt in dein KI-Tool. Die Fakten sind schon eingebaut.', lab:'Entwurf',
+             t:`Du bist Klassenlehrperson einer 8. Klasse der Sekundarstufe I in der Deutschschweiz. Schreibe einen Elternbrief zur Schnupperwoche (maximal 200 Wörter, sachlich und wertschätzend, Anrede «Sie», Hochdeutsch mit «ss»).
+Fakten: Schnupperwoche vom 7. bis 11. September. Die Jugendlichen suchen sich selbst mindestens zwei Schnupperbetriebe (je mindestens zwei Tage). Schriftliche Bestätigung der Betriebe bis 30. Juni an die Klassenlehrperson. Während der Woche gilt der Betrieb als Unterrichtsort, Absenzen meldet der Betrieb direkt an [Name Lehrperson]. Schnupperbericht (eine A4-Seite) bis 18. September. Die Jugendlichen sind über die Familie versichert; offene Fragen bitte vorab mit dem Betrieb klären. Beratung: Berufsberatung [Ort], Termine über das Schulsekretariat.
+Struktur: Ziel, Ablauf und Fristen, Verantwortung, Unterstützung.`},
+            {h:'Version für die Jugendlichen.', d:'Füge den Brief aus Schritt 1 ein.', lab:'Zielgruppe wechseln',
+             t:`Schreibe aus dem folgenden Elternbrief eine Version für die Jugendlichen selbst: Du-Form, höchstens 100 Wörter, klar, nicht belehrend. Alle Fristen müssen genau stimmen.
+
+[Brief aus Schritt 1 einfügen]`},
+            {h:'Übersetzen lassen.', d:'Wähle eine Sprache, die in deiner Klasse vorkommt.', lab:'Übersetzen',
+             t:`Übersetze den folgenden Brief ins [Albanische / Portugiesische / Türkische / Ukrainische / Tigrinya]. Verwende einfache, alltägliche Wörter. Gib danach eine kurze Rückübersetzung ins Deutsche, damit ich die Bedeutung prüfen kann.
+
+[Brief einfügen]`}
+          ],
+          beispiel:`Sehr geehrte Eltern
+
+Im September findet die Schnupperwoche statt (7. bis 11. September). Sie ist ein wichtiger Schritt auf dem Weg zur Berufswahl.
+
+Ablauf und Fristen
+• Ihr Kind sucht sich selbst mindestens zwei Schnupperbetriebe (je mindestens zwei Tage).
+• Die schriftliche Bestätigung der Betriebe gibt Ihr Kind bis 30. Juni bei mir ab.
+• Der Schnupperbericht (eine A4-Seite) ist bis 18. September fällig.
+
+Verantwortung
+Während der Woche gilt der Betrieb als Unterrichtsort. Absenzen meldet der Betrieb direkt an mich. Die Jugendlichen sind über die Familie versichert. Offene Fragen klären Sie bitte vorab mit dem Betrieb.
+
+Unterstützung
+Die Berufsberatung [Ort] berät Sie und Ihr Kind. Termine vergibt das Schulsekretariat.
+
+Freundliche Grüsse
+[Name Lehrperson]`,
+          pruef:['Stimmen alle Fristen und Zuständigkeiten genau?','Hat die KI Regeln erfunden (z.B. zur Versicherung), die du nicht vorgegeben hast?','Ist der Ton für Eltern und Jugendliche passend?','Übersetzung: Stimmt die Rückübersetzung mit dem Original überein?'],
+          nachfragen:['Ergänze eine Checkliste mit allen Fristen als Tabelle.','Welche kritischen Rückfragen könnten Eltern stellen? Formuliere kurze Antworten.','Schreibe eine Erinnerung an die Frist vom 30. Juni in drei Sätzen.']}
+      },
+      weiterKarten:[
+        {t:'Elternfragen vorhersagen', e:'So erkennst du Lücken, bevor die Fragen kommen.', p:'Welche fünf Fragen werden Eltern zu diesem Brief wahrscheinlich stellen? Formuliere kurze Antworten, die ich in eine FAQ übernehmen kann.'},
+        {t:'Ton in drei Varianten', e:'Gerade bei heiklen Themen hilft der Vergleich. Verwende nur erfundene Beispiele.', p:'Schreibe die folgende Rückmeldung in drei Tonlagen: warm und ermutigend, sachlich-neutral, klar und bestimmt. Sage danach, wann welche Tonlage passt.\n\n[Rückmeldung in Stichworten, ohne Namen]'},
+        {t:'Übersetzung gegenprüfen', e:'Nutze ein zweites Tool oder eine neue Chat-Sitzung für die Rückübersetzung.', p:'Übersetze den folgenden Text ins Deutsche. Du kennst den Originaltext nicht.\n\n[Übersetzung einfügen]'},
+        {t:'Kurzfassung für den Klassenchat', e:'Dieselbe Information, ganz knapp.', p:'Fasse den Brief in höchstens drei Sätzen für eine Chat-Nachricht zusammen. Datum, Zeit und Ort müssen enthalten sein.\n\n[Brief einfügen]'}
+      ],
+      transfer:'Welchen Elterntext schreibst du als Nächstes mit KI-Unterstützung? Halte Anlass und Frist fest.',
+      check:['alle Zahlen und Daten stimmen.','du nur erfundene Angaben verwendet hast.','du weisst, wann eine Übersetzung geprüft werden muss.'],
+      vorlage:'Du bist Klassenlehrperson einer [Stufe] in der Deutschschweiz. Schreibe einen Elternbrief (maximal [Anzahl] Wörter, [Ton], Hochdeutsch mit «ss»).\nAnlass: [Anlass]\nFakten: [Datum, Zeit, Ort, Kosten, Abmeldung]\nStruktur: [Abschnitte]'
+    },
+
+    { id:'differenzieren', title:'Differenzieren', bg:'#ed6a69', level:2, min:'20', sub:'Dieselbe Aufgabe auf unterschiedlichen Anforderungsniveaus.',
+      mitnehmen:'Eine Aufgabe in drei Niveaus: stützen, Standard, fordern. Mit demselben Lernziel.',
+      brauchst:'Ein KI-Tool deiner Wahl',
+      hinfuehrung:'Eine Klasse ist nie homogen. KI kann Aufgaben vereinfachen, mit Hilfen versehen oder anspruchsvoller machen. Hier geht es um das kognitive Anforderungsniveau, nicht um das Format.',
+      kartenTitel:'Drei Stellschrauben',
+      karten:[
+        {k:'Sprache', q:'Leseniveau, Satzlänge, Wortschatz, Hilfen für Deutsch als Zweitsprache.'},
+        {k:'Denkstufe', q:'Wiedergeben, anwenden, begründen, beurteilen.'},
+        {k:'Hilfen', q:'Beispiele, Satzanfänge, Tipps, Material.'}
+      ],
+      erklaert:[
+        'Differenzieren heisst: <b>gleiches Lernziel, unterschiedliche Wege</b>. Das Ziel wird nicht verwässert.',
+        'Nenne das Niveau und die Zielgruppe im Prompt <b>ausdrücklich</b>, zum Beispiel «für Kinder mit Deutsch als Zweitsprache».',
+        'Prüfe, ob die stützende Variante wirklich leichter ist und nicht nur kürzer.'
+      ],
+      stolper:[
+        '<b>Weniger statt leichter:</b> Die stützende Variante enthält nur weniger Aufgaben.',
+        '<b>Lernziel verschoben:</b> Die fordernde Variante prüft etwas anderes.',
+        '<b>Zu viel Text:</b> Hilfen, die selbst schwer zu lesen sind.',
+        '<b>Rechenfehler:</b> Aufgaben und Lösungen immer nachrechnen.'
+      ],
+      stufen:{
+        1:{ thema:'Mathematik: Plusaufgabe im Zahlenraum bis 20', szenario:'Deine 2. Klasse übt Additionen mit Zehnerübergang. Du brauchst dieselbe Aufgabe auf drei Niveaus.',
+          steps:[
+            {h:'Drei Varianten erstellen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Varianten',
+             t:`Hier ist eine Aufgabe für eine 2. Klasse (Mathematik, Zahlenraum bis 20, Lernziel: Additionen mit Zehnerübergang lösen).
+Aufgabe: «Mia hat 7 Tannenzapfen. Jonas hat 5 Tannenzapfen. Wie viele Zapfen haben sie zusammen?»
+Erstelle drei Varianten zum gleichen Lernziel:
+1. Stützend: mit Zwanzigerfeld zum Ausmalen und einem vorgerechneten Beispiel.
+2. Standard: wie oben, mit einer zweiten ähnlichen Aufgabe.
+3. Fordernd: offene Aufgabe (z.B. «Finde drei Zahlenpaare mit der Summe 12 und erkläre, was dir auffällt»).
+Kurze Sätze, kindgerechte Sprache, Hochdeutsch. Gib die Varianten als Tabelle aus.`},
+            {h:'Lernziel prüfen lassen.', d:'Füge die Varianten ein.', lab:'Gegenprüfung',
+             t:`Prüfe die folgenden drei Varianten: Üben alle das Lernziel «Additionen mit Zehnerübergang»? Wo ist die stützende Variante nur kürzer statt leichter? Sind alle Rechnungen korrekt?
+
+[Varianten einfügen]`}
+          ],
+          beispiel:`Variante 1 (stützend)
+Mia hat 7 Zapfen. Jonas hat 5 Zapfen.
+Male im Zwanzigerfeld 7 Punkte rot und 5 Punkte blau.
+Wie viele Punkte sind es? ____
+Beispiel: 8 + 5 → erst 8 + 2 = 10, dann 10 + 3 = 13.
+
+Variante 2 (Standard)
+a) Mia hat 7 Zapfen, Jonas 5. Wie viele zusammen?
+b) Lea hat 9 Eicheln, Ben 4. Wie viele zusammen?
+
+Variante 3 (fordernd)
+Finde drei Zahlenpaare mit der Summe 12.
+Was fällt dir auf? Schreibe einen Satz.`,
+          pruef:['Üben alle drei Varianten dasselbe Lernziel (Zehnerübergang)?','Ist die stützende Variante wirklich leichter, nicht nur kürzer?','Sind die Rechnungen korrekt?','Versteht ein Kind die Sätze ohne deine Hilfe?'],
+          nachfragen:['Erstelle für die stützende Variante zwei weitere Aufgaben mit Bildhinweis.','Formuliere die fordernde Aufgabe als kleines Rätsel.','Schreibe die Aufträge zusätzlich in einfachster Sprache für Kinder mit Deutsch als Zweitsprache.']},
+        2:{ thema:'NMG: Sachtext «Der Biber»', szenario:'Deine 5. Klasse liest einen Sachtext. Die Leseniveaus in der Klasse sind sehr unterschiedlich.',
+          steps:[
+            {h:'Drei Varianten erstellen.', d:'Der Text ist schon eingebaut.', lab:'Varianten',
+             t:`Hier ist ein Sachtext für eine 5. Klasse (NMG, Lernziel: erklären, wie der Biber seinen Lebensraum gestaltet).
+
+«Der Biber ist das grösste Nagetier Europas. Er lebt am Wasser und baut Dämme aus Ästen und Schlamm. So staut er einen Bach und schafft einen Teich. In diesem Teich baut er seine Burg. Der Eingang der Burg liegt unter Wasser. Dadurch sind Biber vor Feinden geschützt. Im Winter frisst er die Rinde von Bäumen.»
+
+Erstelle drei Varianten des Auftrags zum gleichen Lernziel:
+1. Mit Unterstützung: Text in kürzeren Sätzen, Wortschatzhilfe (Nagetier, stauen, Rinde), zwei Leitfragen, Satzanfänge für die Antwort.
+2. Standard: Originaltext mit drei Fragen.
+3. Fordernd: Originaltext mit einer Begründungsfrage (z.B. «Warum ist der Burgeingang unter Wasser sinnvoll?») und einer Transferaufgabe (Vergleich mit einem anderen Tier).
+Gib die Varianten als Tabelle aus.`},
+            {h:'Leseniveau einschätzen lassen.', d:'Füge die Varianten ein.', lab:'Gegenprüfung',
+             t:`Schätze das Leseniveau jeder Variante ein (Satzlänge, Wortschatz). Nenne Stellen, die für Kinder mit Deutsch als Zweitsprache schwierig sind, und schlage Vereinfachungen vor.
+
+[Varianten einfügen]`}
+          ],
+          beispiel:`Variante 1 (mit Unterstützung)
+Der Biber lebt am Wasser. Er baut Dämme aus Ästen und Schlamm. So entsteht ein Teich.
+Wörter: Nagetier = Tier mit starken Zähnen. stauen = Wasser aufhalten. Rinde = Aussenseite vom Baum.
+Frage 1: Wo lebt der Biber?
+Frage 2: Was baut er?
+Antwort beginnt mit: «Der Biber baut …»
+
+Variante 2 (Standard)
+1. Wie gestaltet der Biber seinen Lebensraum?
+2. Wo liegt der Eingang der Burg?
+3. Was frisst der Biber im Winter?
+
+Variante 3 (fordernd)
+Warum ist der Burgeingang unter Wasser sinnvoll? Begründe.
+Vergleiche den Biber mit einem anderen Tier, das seinen Lebensraum verändert.`,
+          pruef:['Bleibt das Lernziel in allen Varianten gleich?','Sind die Hilfen selbst leicht lesbar?','Stimmt die Sachinformation?','Ist die Begründungsfrage lösbar?'],
+          nachfragen:['Erstelle eine Wortschatzliste mit Bildideen für Kinder mit Deutsch als Zweitsprache.','Schreibe drei Hilfekärtchen (Tipp 1, 2, 3) zur Begründungsfrage.','Erstelle eine Knobelaufgabe für Kinder, die schneller fertig sind.']},
+        3:{ thema:'Deutsch: Stellungnahme schreiben', szenario:'Deine 8. Klasse schreibt eine Stellungnahme. Ein Teil der Klasse hat Mühe mit dem Aufbau, andere wollen mehr Anspruch.',
+          steps:[
+            {h:'Drei Varianten erstellen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Varianten',
+             t:`Hier ist eine Schreibaufgabe für eine 8. Klasse (Deutsch, mittleres Anforderungsniveau, Lernziel: eine Stellungnahme mit These, Argumenten und Beispielen schreiben).
+Aufgabe: «Sollen Handys im Schulhaus verboten werden? Schreibe eine Stellungnahme.»
+Erstelle drei Varianten zum gleichen Lernziel:
+1. Stützend: Pro-und-Kontra-Raster zum Ausfüllen, Satzanfänge für These und Argumente, ein Beispielabsatz.
+2. Standard: die Aufgabe mit einer Checkliste für den Aufbau.
+3. Fordernd: zusätzlich ein Gegenargument entkräften und ein Argument mit einer überprüfbaren Quelle belegen.
+Gib die Varianten als Tabelle aus.`},
+            {h:'Fairness prüfen lassen.', d:'Füge die Varianten ein.', lab:'Gegenprüfung',
+             t:`Prüfe die drei Varianten: Wird in allen dasselbe Lernziel verlangt? Wo könnten Jugendliche mit Deutsch als Zweitsprache oder mit Leseschwierigkeiten unnötig behindert werden?
+
+[Varianten einfügen]`}
+          ],
+          beispiel:`Variante 1 (stützend)
+Meine These: Handys im Schulhaus sollten ______ sein.
+Argument 1: Ein Grund dafür ist, dass ______.
+Beispiel: Zum Beispiel ______.
+Pro | Contra   (Raster zum Ausfüllen)
+
+Variante 2 (Standard)
+Schreibe eine Stellungnahme (150 bis 200 Wörter).
+Checkliste: These – zwei Argumente mit Beispiel – Schluss.
+
+Variante 3 (fordernd)
+Wie Variante 2. Zusätzlich:
+– Entkräfte ein Gegenargument.
+– Belege ein Argument mit einer überprüfbaren Quelle.`,
+          pruef:['Wird überall dieselbe Textsorte verlangt?','Nimmt die stützende Variante den Jugendlichen das Denken ab?','Ist die fordernde Variante in der verfügbaren Zeit machbar?','Sind Quellenangaben überprüfbar (siehe Station «Halluzinationen»)?'],
+          nachfragen:['Formuliere für die stützende Variante drei Hilfen auf Karten (Tipp 1, 2, 3).','Erstelle ein Beurteilungsraster zu den drei Varianten, das für alle gleich gilt.','Schreibe einen Musterabsatz, der ein Gegenargument entkräftet.']}
+      },
+      weiterKarten:[
+        {t:'Verschiedene Zugänge', e:'Dasselbe Lernziel über handelnde, bildhafte und sprachliche Wege.', p:'Entwirf drei Zugänge zum Lernziel [Lernziel] für [Stufe]: einen handelnden, einen bildhaften und einen sprachlichen. Beschreibe jeweils Material und Ablauf in drei Sätzen.'},
+        {t:'Hilfekärtchen', e:'Gestufte Hilfen statt sofortiger Lösung.', p:'Erstelle für die folgende Aufgabe drei gestufte Hilfekärtchen: Tipp 1 (ein Anstoss), Tipp 2 (ein Rechenweg oder eine Struktur), Tipp 3 (eine Teillösung).\n\n[Aufgabe einfügen]'},
+        {t:'DaZ-Wortschatz', e:'Wortschatzhilfen, die Kinder wirklich brauchen.', p:'Wähle aus dem folgenden Text die 8 wichtigsten Wörter für Kinder mit Deutsch als Zweitsprache aus. Erkläre sie einfach und schlage zu jedem Wort eine Bildidee vor.\n\n[Text einfügen]'},
+        {t:'Stolpersteine erkennen', e:'Was könnte die Aufgabe für einzelne Kinder schwierig machen?', p:'Welche Stolpersteine hat die folgende Aufgabe für Kinder mit Deutsch als Zweitsprache, Lese-Rechtschreib-Schwierigkeiten oder wenig Vorwissen? Schlage je eine Anpassung vor.\n\n[Aufgabe einfügen]'}
+      ],
+      transfer:'Für welche Aufgabe der nächsten Woche brauchst du eine zweite Variante? Halte Aufgabe und Niveau fest.',
+      check:['das Lernziel in allen Varianten gleich ist.','Sprache und Hilfen wirklich verständlich sind.','du die Aufgabe selbst durchgespielt hast.'],
+      vorlage:'Hier ist eine Aufgabe für [Stufe] ([Fach], Lernziel: [Lernziel]):\n\n[Aufgabe oder Text einfügen]\n\nErstelle drei Varianten zum gleichen Lernziel:\n1. Stützend (kurze Sätze, Wortschatzhilfe, Beispiel)\n2. Standard\n3. Fordernd (begründen, beurteilen, übertragen)\nGib sie als Tabelle aus.'
+    },
+
+    { id:'umwandeln', title:'Material umwandeln', bg:'#c7d200', level:2, min:'20', sub:'Aus einem Text wird ein Quiz, ein Hörtext, ein Skript, Lernkarten …',
+      mitnehmen:'Ein Ausgangsmaterial in mindestens drei andere Formate verwandeln.',
+      brauchst:'Ein KI-Tool deiner Wahl. Für Hörtexte: die Vorlesefunktion deines Geräts oder KI-Tools.',
+      hinfuehrung:'Gleicher Inhalt, anderes Format: Das öffnet neue Zugänge und spart Vorbereitungszeit. Aus einem Sachtext entstehen in Minuten ein Quiz, Lernkarten, ein Dialog, ein Hörtext oder ein Erklärskript.',
+      kartenTitel:'Formate zur Auswahl',
+      karten:[
+        {k:'Quiz', q:'Multiple Choice, Richtig/Falsch, Lückentext.'},
+        {k:'Lernkarten', q:'Frage vorne, Antwort hinten.'},
+        {k:'Hören', q:'Dialog oder Vorlesetext zum Anhören.'},
+        {k:'Andere Zielgruppe', q:'Eltern, jüngere Kinder, Fachkolleginnen.'},
+        {k:'Struktur', q:'Mindmap, Tabelle, Ablauf.'},
+        {k:'Spielen', q:'Rollenspiel, Interview, Bewegungsspiel.'}
+      ],
+      erklaert:[
+        'Der Inhalt bleibt, das <b>Format</b> ändert sich: lesen wird zu hören, spielen oder üben.',
+        'Verwende die Formulierung <b>«Verwende nur Informationen aus dem Text»</b>, damit nichts dazuerfunden wird.',
+        'Für Audio: Lass einen <b>Sprechtext</b> schreiben und nutze die Vorlesefunktion deines Geräts (oft unter «Sprachausgabe» oder «Vorlesen» in den Einstellungen) oder einen Vorlesen-Button im KI-Tool.'
+      ],
+      stolper:[
+        '<b>Details gehen verloren oder kommen dazu.</b> Immer mit dem Originaltext abgleichen.',
+        '<b>Falsche Lösungen</b> im Quiz.',
+        '<b>Zu schwierige Sprache</b> im umgewandelten Format.',
+        '<b>Urheberrecht:</b> Fremde Lehrmitteltexte nicht einfach weiterverarbeiten und verteilen.'
+      ],
+      stufen:{
+        1:{ thema:'Text «Der Apfelbaum im Jahreslauf»', szenario:'Du hast einen kurzen Text für deine 2. Klasse und möchtest daraus Wortkarten, einen Hörtext und ein Bewegungsspiel machen.',
+          steps:[
+            {h:'In drei Formate umwandeln.', d:'Der Text ist schon eingebaut.', lab:'Umwandeln',
+             t:`Hier ist ein Text für eine 2. Klasse:
+
+«Im Frühling blüht der Apfelbaum. Bienen holen Nektar. Im Sommer wachsen kleine Äpfel. Im Herbst sind sie reif. Wir pflücken sie. Im Winter hat der Baum keine Blätter.»
+
+Erstelle daraus:
+1. Sechs Wortkarten mit je einem Wort und einer Bildidee zum Zeichnen.
+2. Einen Vorlesetext (maximal 60 Wörter) mit kurzen Pausen und Geräuschen, die ich selbst mache.
+3. Ein Bewegungsspiel für den Turnraum zu den vier Jahreszeiten.
+Verwende nur Informationen aus dem Text. Einfache Sprache, Hochdeutsch.`},
+            {h:'Anhören.', d:'Lass dir den Vorlesetext mit der Vorlesefunktion deines Geräts oder KI-Tools vorlesen. Wirkt er auch für Kinder gut?'}
+          ],
+          beispiel:`Wortkarten
+Frühling – Blüte (rosa Blüten zeichnen)
+Biene – Biene mit Blüte
+Sommer – kleiner grüner Apfel
+Herbst – roter Apfel im Korb
+Pflücken – Hand am Ast
+Winter – kahler Baum
+
+Vorlesetext
+Es ist Frühling. (Pause) Der Apfelbaum blüht. (summen wie eine Biene) …
+
+Bewegungsspiel
+Frühling: Alle blühen auf (Hände öffnen). Sommer: Äpfel wachsen (klein machen, dann gross). Herbst: Äpfel pflücken (strecken). Winter: kahler Baum (still stehen).`,
+          pruef:['Stimmt alles mit dem Originaltext überein?','Sind die Wörter für 2.-Klässler verständlich?','Funktioniert das Bewegungsspiel mit deiner Klassengrösse?','Klingt der Vorlesetext beim Vorlesen gut?'],
+          nachfragen:['Mach den Vorlesetext noch kürzer.','Erstelle zu den Wortkarten ein Memory-Spiel.','Schreibe dieselbe Information als kurzes Gedicht mit Reim.']},
+        2:{ thema:'Text «Der Bundesbrief 1291»', szenario:'Du hast einen kurzen Sachtext für deine 5./6. Klasse und möchtest daraus ein Quiz, einen Dialog und Lernkarten machen.',
+          steps:[
+            {h:'In drei Formate umwandeln.', d:'Der Text ist schon eingebaut.', lab:'Umwandeln',
+             t:`Hier ist ein Text für eine 5./6. Klasse:
+
+«Im Jahr 1291 schlossen die Talschaften Uri, Schwyz und Unterwalden einen Bund. Sie versprachen sich gegenseitige Hilfe, wenn jemand sie angreift. Auch bei Streit untereinander sollten Richter helfen. Der Bundesbrief wurde auf Pergament geschrieben und mit Siegeln besiegelt. Später wurde er zum Symbol der Schweiz.»
+
+Erstelle daraus:
+1. Ein Quiz mit 5 Multiple-Choice-Fragen (mit Lösungen).
+2. Ein kurzes Gespräch zwischen zwei Kindern (maximal 120 Wörter), das den Inhalt erklärt.
+3. Acht Lernkarten (Vorderseite: Frage, Rückseite: Antwort).
+Verwende nur Informationen aus dem Text.`},
+            {h:'Hörtext erzeugen.', d:'Lass dir das Gespräch mit der Vorlesefunktion vorlesen oder nimm es mit zwei Kindern auf. Was funktioniert besser?'}
+          ],
+          beispiel:`Quiz (Auszug)
+1. Wer schloss 1291 einen Bund?
+   a) Bern, Zürich, Luzern  b) Uri, Schwyz, Unterwalden  c) Genf, Waadt, Wallis
+   Lösung: b
+
+Gespräch (Auszug)
+Mia: Warum haben die Talschaften 1291 einen Bund geschlossen?
+Leo: Sie wollten sich gegenseitig helfen, wenn jemand sie angreift.
+
+Lernkarte
+Vorderseite: Worauf wurde der Bundesbrief geschrieben?
+Rückseite: Auf Pergament.`,
+          pruef:['Stimmen alle Lösungen mit dem Originaltext überein?','Ist ein Quiz-Antwortvorschlag doppeldeutig?','Ist das Gespräch für Kinder natürlich?','Wurde etwas hinzugefügt, das nicht im Text steht?'],
+          nachfragen:['Erstelle drei zusätzliche Fragen für Kinder, die schneller fertig sind.','Wandle das Quiz in ein Quizspiel mit Punkten um.','Schreibe eine Elternversion des Textes in drei Sätzen.']},
+        3:{ thema:'Text «Treibhauseffekt»', szenario:'Du hast einen Sachtext für deine 8. Klasse und möchtest daraus ein Erklärskript, einen Lückentext und Diskussionsimpulse machen.',
+          steps:[
+            {h:'In drei Formate umwandeln.', d:'Der Text ist schon eingebaut.', lab:'Umwandeln',
+             t:`Hier ist ein Text für eine 8. Klasse:
+
+«Die Erde wird von der Sonne erwärmt und gibt einen Teil der Wärme als Infrarotstrahlung wieder ab. Gase wie Kohlenstoffdioxid und Methan in der Atmosphäre halten einen Teil dieser Strahlung zurück. Dieser natürliche Treibhauseffekt macht die Erde bewohnbar. Durch das Verbrennen von Kohle, Öl und Gas gelangt zusätzliches Kohlenstoffdioxid in die Luft. Der Effekt verstärkt sich, und die globale Temperatur steigt.»
+
+Erstelle daraus:
+1. Ein Sprechskript für ein Erklärvideo von 60 Sekunden (zwei Sprecher, mit Szenenhinweisen).
+2. Einen Lückentext mit 6 Lücken (mit Lösungen).
+3. Vier Diskussionsimpulse, die zum Nachdenken über Handlungsmöglichkeiten anregen.
+Verwende nur Informationen aus dem Text.`},
+            {h:'Hörtext erzeugen.', d:'Lass dir das Skript vorlesen oder sprecht es selbst ein. Ist die Länge passend?'}
+          ],
+          beispiel:`Skript (Auszug)
+Sprecherin: Die Sonne wärmt unsere Erde. (Bild: Erde mit Sonnenstrahlen)
+Sprecher: Ein Teil der Wärme geht zurück ins All. Gase in der Luft halten aber einen Teil zurück.
+
+Lückentext (Auszug)
+Gase wie ______ und Methan halten einen Teil der Wärmestrahlung zurück.
+Lösung: Kohlenstoffdioxid
+
+Diskussionsimpuls
+Welche Entscheidungen im Alltag verändern die Menge an Kohlenstoffdioxid?`,
+          pruef:['Stimmen alle fachlichen Aussagen?','Passt die Länge des Skripts zu 60 Sekunden?','Sind die Lücken eindeutig lösbar?','Regen die Impulse wirklich zum Diskutieren an?'],
+          nachfragen:['Mache das Skript für Jugendliche lebendiger, ohne neue Fakten zu erfinden.','Ergänze eine Aufgabe, bei der Jugendliche die Quelle einer Zahl prüfen.','Erstelle dieselbe Information als einfache Tabelle (Ursache – Wirkung).']}
+      },
+      weiterKarten:[
+        {t:'Elternversion', e:'Dieselbe Information in einfacher Sprache für Eltern.', p:'Schreibe den folgenden Text so um, dass ihn Eltern ohne Fachwissen verstehen. Höchstens 100 Wörter, keine Fachwörter.\n\n[Text einfügen]'},
+        {t:'Mindmap als Liste', e:'Eine Struktur, die du abzeichnen oder an die Wandtafel bringen kannst.', p:'Gliedere den folgenden Text als Mindmap in Listenform: ein Zentrum, vier Hauptäste, je zwei Unteräste.\n\n[Text einfügen]'},
+        {t:'Rollenspiel oder Interview', e:'Aus einem Text wird eine Szene.', p:'Schreibe aus dem folgenden Text ein Interview zwischen einer Reporterin und einer Person, die die Sache erlebt hat. Höchstens 150 Wörter.\n\n[Text einfügen]'},
+        {t:'Stufe wechseln', e:'Dieselbe Information für jüngere oder ältere Kinder.', p:'Schreibe den folgenden Text für Kinder der [Stufe] um. Wortschatz und Satzlänge sollen zu dieser Stufe passen.\n\n[Text einfügen]'}
+      ],
+      transfer:'Welcher Text aus deinem Unterricht würde in einem anderen Format besser ankommen? Halte Text und Format fest.',
+      check:['du mindestens drei Formate ausprobiert hast.','die Inhalte mit dem Original übereinstimmen.','du weisst, wie du einen Hörtext erstellen kannst.'],
+      vorlage:'Hier ist ein Text für [Stufe]:\n\n[Text einfügen]\n\nErstelle daraus:\n1. [Format 1]\n2. [Format 2]\n3. [Format 3]\nVerwende nur Informationen aus dem Text.'
+    },
+
+    { id:'feedback', title:'Feedback', bg:'#9aa4e8', level:2, min:'20', sub:'Formativ rückmelden – damit Lernen weitergeht.',
+      mitnehmen:'Aus einem Schülertext ein konkretes, lernförderndes Feedback gestalten und Lernziele in Kindersprache übersetzen.',
+      brauchst:'Ein KI-Tool deiner Wahl',
+      hinfuehrung:'Formatives Feedback soll Lernen anstossen: Was gelingt schon? Was ist der nächste Schritt? KI kann kindgerechte, konkrete Formulierungen vorschlagen. Eine Note oder Beurteilung ist es nicht.',
+      kartenTitel:'Drei Bausteine guten Feedbacks',
+      karten:[
+        {k:'Stärke', q:'Was gelingt schon? Konkret benennen, nicht nur «gut».'},
+        {k:'Nächster Schritt', q:'Was ist als Nächstes machbar? Ein Schritt, nicht fünf.'},
+        {k:'Frage', q:'Welche Frage regt zum Weiterdenken an?'}
+      ],
+      erklaert:[
+        'Gutes Feedback ist <b>konkret</b>, <b>zielbezogen</b> und zeigt den <b>nächsten Schritt</b>. Es geht um Lernen, nicht um Bewerten.',
+        'KI kann Formulierungen liefern. <b>Du</b> kennst das Kind und entscheidest, was passt.',
+        'Verwende nur <b>erfundene Schülertexte</b>. Echte Texte mit Namen oder Hinweisen auf Kinder gehören nicht in ein KI-Tool.'
+      ],
+      stolper:[
+        '<b>Floskeln:</b> «Toll gemacht, weiter so.» sagt nichts.',
+        '<b>Zu viel auf einmal:</b> fünf Verbesserungen statt einer.',
+        '<b>Zu schwierige Sprache</b> für das Kind.',
+        '<b>Bewertung statt Feedback:</b> Noten und Urteile gehören in die Beurteilung.'
+      ],
+      stufen:{
+        1:{ thema:'Rückmeldung zu einem Kindertext (1. Klasse)', szenario:'Ein Kind hat seinen ersten kurzen Text geschrieben. Du möchtest ihm in Kindersprache rückmelden, was gelingt und was der nächste Schritt ist.',
+          steps:[
+            {h:'Feedback entwerfen.', d:'Der erfundene Kindertext ist schon eingebaut.', lab:'Feedback',
+             t:`Du bist Lehrperson einer 1. Klasse. Lernziel: «Ich schreibe Sätze mit Grossbuchstaben am Anfang und einem Punkt am Schluss.»
+Hier ist ein erfundener Kindertext:
+«Ich bin mit Oma im Zoo. wir haben ein Löwe gesehen. Er war gros.»
+Schreibe ein Feedback für das Kind: zwei konkrete Stärken, einen nächsten Schritt mit einem Beispiel und eine Frage zum Weiterdenken. Höchstens 40 Wörter, Duform, ganz einfache Sprache.`},
+            {h:'Lernziel in Kindersprache.', d:'Wähle ein eigenes Lernziel oder nimm dieses.', lab:'Ich-kann-Satz',
+             t:`Formuliere das Lernziel «Sätze mit Grossbuchstaben und Punkt schreiben» für Kinder der 1. Klasse als drei «Ich kann»-Sätze, die ein Kind selbst abhaken kann.`}
+          ],
+          beispiel:`Das gefällt mir: Du hast gleich zwei Sätze mit einem Punkt am Schluss geschrieben. Und du hast den Löwen genau beobachtet!
+Nächster Schritt: Nach dem Punkt beginnt ein neuer Satz mit einem grossen Buchstaben, wie bei «Wir».
+Frage: Was hat der Löwe im Zoo gemacht?`,
+          pruef:['Versteht ein Kind das ohne Hilfe?','Sind die Stärken konkret und wahr?','Ist es nur ein nächster Schritt?','Würdest du das genau so sagen?'],
+          nachfragen:['Schreibe die Rückmeldung noch einfacher, mit höchstens 25 Wörtern.','Formuliere eine mündliche Version zum Vorlesen für das Kind.','Gib einen kleinen Auftrag, mit dem das Kind den nächsten Schritt üben kann.']},
+        2:{ thema:'Rückmeldung zu einer Beschreibung (5. Klasse)', szenario:'Ein Kind hat einen Lieblingsort beschrieben. Du möchtest eine Rückmeldung, die zum Weiterschreiben anregt.',
+          steps:[
+            {h:'Feedback entwerfen.', d:'Der erfundene Kindertext ist schon eingebaut.', lab:'Feedback',
+             t:`Du bist Lehrperson einer 5. Klasse. Lernziel: «Ich beschreibe einen Ort so genau, dass andere ihn sich vorstellen können (Sinne, genaue Wörter).»
+Hier ist ein erfundener Schülertext:
+«Mein Lieblingsort ist der Wald hinter unserem Haus. Es ist dort schön. Es hat Bäume und Vögel. Ich gehe oft dort hin.»
+Schreibe ein Feedback in Duform: zwei konkrete Stärken, einen nächsten Schritt mit einem Beispiel, eine Frage zum Weiterdenken. Höchstens 70 Wörter, freundlich und klar.`},
+            {h:'Kriterienraster in Kindersprache.', d:'Zum gleichen Lernziel.', lab:'Raster',
+             t:`Erstelle für das Lernziel «Einen Ort genau beschreiben» ein Raster mit vier Zeilen in Kindersprache («Ich …»). Jede Zeile hat drei Stufen: Das übe ich noch, Das kann ich, Das kann ich besonders gut. Mit je einem Kurzbeispiel.`}
+          ],
+          beispiel:`Das gefällt mir: Du hast einen Ort gewählt, der dir wichtig ist, und du schreibst, dass du oft dort bist. Das zeigt, dass er dir etwas bedeutet.
+Nächster Schritt: Schreibe, was man dort sehen, hören und riechen kann. Statt «Es ist dort schön» zum Beispiel: «Die Sonne scheint durch die Blätter, und die Vögel singen».
+Frage: Was würde dich dort überraschen, wenn du das erste Mal hinkämst?`,
+          pruef:['Sind die Stärken wirklich im Text zu finden?','Ist der nächste Schritt für das Kind machbar?','Ist die Sprache für 5.-Klässler passend?','Würde es das Kind motivieren, weiterzuschreiben?'],
+          nachfragen:['Schreibe drei Varianten mit unterschiedlichem Fokus: Inhalt, Sprache, Aufbau.','Formuliere Satzanfänge, mit denen Kinder sich gegenseitig Feedback geben können.','Schlage eine kurze Übung vor, mit der das Kind genauer beschreiben lernt.']},
+        3:{ thema:'Rückmeldung zu einer Argumentation (8. Klasse)', szenario:'Ein Jugendlicher hat einen kurzen argumentierenden Text geschrieben. Du möchtest eine Rückmeldung, die den nächsten Lernschritt klar macht.',
+          steps:[
+            {h:'Feedback entwerfen.', d:'Der erfundene Schülertext ist schon eingebaut.', lab:'Feedback',
+             t:`Du bist Deutschlehrperson einer 8. Klasse. Lernziel: «Ich begründe eine Meinung mit Argument und Beispiel (These – Argument – Beispiel).»
+Hier ist ein erfundener Schülertext:
+«Ich finde, Handys sollten im Schulhaus erlaubt sein, weil man sie sonst vermisst. Ausserdem kann man damit nachschauen, wenn man etwas nicht weiss. Deshalb ist ein Verbot unfair.»
+Schreibe ein Feedback in Duform: zwei konkrete Stärken, einen nächsten Schritt mit einem Beispiel, eine Frage, die zum Weiterdenken anregt. Höchstens 90 Wörter, respektvoll und klar.`},
+            {h:'Feed-forward.', d:'Nutze das Feedback für die nächste Übung.', lab:'Übung',
+             t:`Schlage für den Jugendlichen eine kurze Übung (höchstens 10 Minuten) vor, mit der er den nächsten Schritt üben kann. Gib ein neues Thema vor, ohne die gleiche Aufgabe zu wiederholen.`}
+          ],
+          beispiel:`Das gefällt mir: Du nimmst klar Stellung, und dein zweites Argument (Nachschauen) ist ein realistischer Grund.
+Nächster Schritt: Stütze dein Argument mit einem Beispiel aus dem Schulalltag, etwa «Wenn wir in Geschichte ein Datum nicht wissen, …». Dann wird es überzeugender.
+Frage: Welches Gegenargument würde ein Lehrer nennen, und wie würdest du darauf antworten?`,
+          pruef:['Sind die Stärken wirklich im Text zu finden?','Ist der nächste Schritt umsetzbar?','Ist der Ton respektvoll und nicht belehrend?','Würdest du das dem Jugendlichen so sagen?'],
+          nachfragen:['Gib das Feedback in einer Version mit Du, aber bestimmter im Ton.','Erstelle ein Selbsteinschätzungsraster für Jugendliche zu dieser Textsorte.','Formuliere Peer-Feedback-Fragen, die Jugendliche einander stellen können.']}
+      },
+      weiterKarten:[
+        {t:'Drei Fokus-Varianten', e:'Dasselbe Feedback mit anderem Schwerpunkt.', p:'Schreibe zum folgenden Text drei Feedback-Varianten mit unterschiedlichem Fokus: Inhalt, Sprache, Aufbau. Je höchstens 50 Wörter.\n\n[Text einfügen]'},
+        {t:'Raster in Kindersprache', e:'Kriterien, die Kinder verstehen und selbst anwenden können.', p:'Übersetze die folgenden Kriterien in Kindersprache für [Stufe] und ergänze zu jedem ein kurzes Beispiel.\n\n[Kriterien einfügen]'},
+        {t:'Peer-Feedback anleiten', e:'Kinder geben einander Rückmeldungen mit Satzanfängen.', p:'Erstelle für [Stufe] sechs Satzanfänge, mit denen Kinder einander wertschätzendes, konkretes Feedback geben können.'},
+        {t:'Eigene Reflexion', e:'Feedback an dich selbst: Was hat gewirkt?', p:'Ich habe folgendes Feedback gegeben: [Feedback einfügen]. Welche Wirkung kann es auf ein Kind haben? Was könnte missverständlich sein?'}
+      ],
+      transfer:'Zu welcher Lernsituation gibst du nächste Woche formatives Feedback? Halte Situation und Lernziel fest.',
+      check:['das Feedback einen konkreten nächsten Schritt nennt.','du nur erfundene Texte verwendet hast.','du weisst, wo deine eigene Einschätzung entscheidet.'],
+      vorlage:'Du bist Lehrperson einer [Stufe]. Lernziel: [Lernziel].\nHier ist ein erfundener Schülertext:\n[Text einfügen]\nSchreibe ein Feedback in Duform: zwei konkrete Stärken, einen nächsten Schritt mit Beispiel, eine Frage zum Weiterdenken. Höchstens [Anzahl] Wörter.'
+    },
+
+    { id:'beurteilung', title:'Beurteilung', bg:'#f4a3c8', level:3, min:'25', sub:'Summativ beurteilen: KI als Entwurfshilfe. Die Entscheidung bleibt bei dir.',
+      mitnehmen:'Ein Kriterienraster oder eine Prüfung mit KI entwerfen und kritisch prüfen.',
+      brauchst:'Ein KI-Tool deiner Wahl. Keine echten Schülerdaten.',
+      hinfuehrung:'Beurteilung hat Folgen für Kinder und Familien. Darum gelten hier höhere Ansprüche an Qualität, Transparenz und Datenschutz. KI hilft bei Entwürfen, nicht bei der Bewertung.',
+      kartenTitel:'Geeignet und heikel',
+      karten:[
+        {k:'Geeignet', q:'Kriterienraster entwerfen und Aufgaben für Prüfungen vorschlagen.'},
+        {k:'Geeignet', q:'Lernziele und Aufgaben abgleichen. Berichtsformulierungen als Entwurf.'},
+        {k:'Heikel', q:'Echte Leistungen, Zeugnisinformationen oder Beobachtungen zu Kindern eingeben.'},
+        {k:'Nicht delegieren', q:'Noten vergeben und über Förderung oder Übertritt entscheiden.'}
+      ],
+      erklaert:[
+        'Die <b>professionelle Beurteilung bleibt bei dir</b>. KI liefert Entwürfe, du prüfst, verbesserst und verantwortest.',
+        'Prüfe Aufgaben und Raster auf <b>Passung zu den Lernzielen</b>, Beobachtbarkeit, Schwierigkeit und Fairness.',
+        'Gib <b>keine echten Schülerleistungen</b> oder Zeugnisinformationen ein. Arbeite mit erfundenen Beispielen.'
+      ],
+      stolper:[
+        '<b>Nicht beobachtbare Kriterien:</b> «Zeigt Engagement» ist schwer zu beurteilen.',
+        '<b>Aufgaben passen nicht zum Lernziel.</b>',
+        '<b>Rechen- und Punktefehler</b> bei Punkteverteilung und Lösungen.',
+        '<b>Unfaire Kriterien:</b> benachteiligen z.B. Kinder mit Deutsch als Zweitsprache.'
+      ],
+      stufen:{
+        1:{ thema:'Beobachtungsraster «Erzählen zu einem Bild»', szenario:'In deiner 1./2. Klasse möchtest du das mündliche Erzählen zu einem Bild beobachten und rückmelden. Du brauchst einen Beobachtungsraster.',
+          steps:[
+            {h:'Raster entwerfen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Raster',
+             t:`Du bist eine erfahrene Lehrperson in Zyklus 1 in der Deutschschweiz. Entwirf einen Beobachtungsraster für die Kompetenz «Ich erzähle zusammenhängend zu einem Bild» (1./2. Klasse).
+Vier Kriterien, je drei Stufen (noch nicht / teilweise / erreicht). Die Kriterien müssen beobachtbar sein (z.B. «nennt mindestens drei Dinge auf dem Bild»). Gib das Ergebnis als Tabelle aus und ergänze für jedes Kriterium ein Beispiel für Stufe «erreicht».`},
+            {h:'Fairness prüfen.', d:'Füge das Raster ein.', lab:'Fairness-Check',
+             t:`Prüfe das folgende Raster: Welche Kriterien könnten Kinder mit Deutsch als Zweitsprache oder schüchterne Kinder benachteiligen? Welche sind nicht eindeutig beobachtbar? Schlage Anpassungen vor.
+
+[Raster einfügen]`}
+          ],
+          beispiel:`Kriterium 1: Inhalt
+noch nicht – nennt einzelne Dinge ohne Zusammenhang
+teilweise – nennt Dinge und verbindet sie teilweise
+erreicht – nennt mindestens drei Dinge und verbindet sie mit «dann» oder «und»
+
+Kriterium 2: Satzbau
+erreicht – bildet ganze Sätze (Subjekt und Verb)
+…`,
+          pruef:['Sind alle Kriterien in ein bis zwei Minuten beobachtbar?','Sind die Stufen klar unterscheidbar?','Passt das Raster zum Lehrplan 21 und zum Alter der Kinder?','Welches Kriterium würdest du streichen oder ändern?'],
+          nachfragen:['Formuliere die Kriterien als «Ich kann»-Sätze für Kinder.','Erstelle eine Beobachtungsliste für eine Gruppe von 6 Kindern.','Schlage drei Bilder-Situationen für die Beobachtung vor.']},
+        2:{ thema:'Prüfung zur Flächenberechnung (5. Klasse)', szenario:'Du möchtest eine Mathematikprüfung zur Flächenberechnung von Rechtecken, mit Lösungen und Punkten.',
+          steps:[
+            {h:'Prüfung entwerfen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Prüfung',
+             t:`Du bist eine erfahrene Mathematiklehrperson einer 5. Klasse in der Deutschschweiz. Erstelle eine Prüfung (30 Minuten) zum Lernziel «Fläche von Rechtecken berechnen und in Alltagssituationen anwenden».
+Sechs Aufgaben mit steigendem Anspruch (zwei Aufgaben Wissen/Rechnen, zwei Aufgaben Anwenden, zwei Aufgaben Knobeln). Total 24 Punkte, Punkteverteilung pro Aufgabe. Mit Lösungsweg und Lösungen für mich. Aufgaben aus dem Alltag der Kinder (Zimmer, Pausenplatz, Spielfeld). Schweizer Einheiten (m, cm).`},
+            {h:'Aufgaben nachrechnen lassen.', d:'Füge die Prüfung ein.', lab:'Gegenprobe',
+             t:`Rechne jede Aufgabe der folgenden Prüfung selbst nach und vergleiche mit der Lösung. Nenne alle Aufgaben, bei denen die Lösung falsch, uneindeutig oder zu schwer für eine 5. Klasse ist.
+
+[Prüfung mit Lösungen einfügen]`}
+          ],
+          beispiel:`Aufgabe 1 (2 Punkte): Wie gross ist die Fläche eines Rechtecks mit 6 m Länge und 4 m Breite?
+Lösung: 24 m²
+
+Aufgabe 4 (4 Punkte): Dein Zimmer ist 4 m lang und 3 m breit. Ein Teppich deckt die Hälfte der Fläche ab. Wie gross ist der Teppich?
+Lösung: 12 m² : 2 = 6 m²
+
+Aufgabe 6 (5 Punkte): Ein Rechteck hat die Fläche 36 m². Gib zwei mögliche Seitenlängen an und begründe.`,
+          pruef:['Rechne alle Lösungen selbst nach.','Passt jede Aufgabe zum Lernziel?','Stimmt die Punkteverteilung (Summe 24)?','Würden deine Kinder die Aufgabe so verstehen?'],
+          nachfragen:['Erstelle eine zweite, gleichwertige Prüfung (Parallelversion).','Schlage ein Bewertungsraster für die Knobelaufgaben vor.','Erkläre, wie du die Punkte in eine Note umrechnen könntest (Notenskala Vorschlag).']},
+        3:{ thema:'Beurteilungsraster «Stellungnahme» (8. Klasse)', szenario:'Du beurteilst eine Stellungnahme in Deutsch und brauchst ein Raster, das Punkte und eine Notenskala vorschlägt.',
+          steps:[
+            {h:'Raster entwerfen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Raster',
+             t:`Du bist eine erfahrene Deutschlehrperson der Sekundarstufe I in der Deutschschweiz. Entwirf ein Beurteilungsraster für eine Stellungnahme (8. Klasse, mittleres Anforderungsniveau).
+Vier Kriterien (Inhalt/Argumente, Aufbau, Sprache, Rechtschreibung), vier Stufen mit kurzen, beobachtbaren Beschreibungen, Punkte pro Stufe und eine Gewichtung. Schlage eine Umrechnung der Punkte in Noten von 1 bis 6 vor (4 = genügend). Gib alles als Tabelle aus.`},
+            {h:'Fairness und Passung prüfen.', d:'Füge das Raster ein.', lab:'Fairness-Check',
+             t:`Prüfe das folgende Raster auf Fairness: Wird Rechtschreibung zu stark gewichtet? Welche Kriterien benachteiligen Jugendliche mit Deutsch als Zweitsprache oder Lese-Rechtschreib-Schwierigkeiten? Wo sind die Formulierungen nicht eindeutig beobachtbar? Schlage Änderungen vor.
+
+[Raster einfügen]`}
+          ],
+          beispiel:`Kriterium Inhalt/Argumente (Gewichtung 40 %)
+Stufe 4 (sehr gut): klare These, mindestens zwei Argumente mit je einem Beispiel
+Stufe 3: klare These, zwei Argumente, ein Beispiel
+Stufe 2: These erkennbar, ein Argument ohne Beispiel
+Stufe 1: keine klare These
+
+Umrechnung (Vorschlag): 90–100 % = Note 6, 75–89 % = Note 5, … 60 % = Note 4`,
+          pruef:['Sind die Stufen unterscheidbar und beobachtbar?','Stimmt die Gewichtung mit deinen Lernzielen überein?','Ist die Umrechnung in Noten rechnerisch korrekt?','Wo würde das Raster Jugendliche benachteiligen?'],
+          nachfragen:['Erstelle eine Version des Rasters in verständlicher Sprache für die Jugendlichen.','Schlage drei Beispiele für Texte auf den Stufen 1, 2 und 4 vor (erfunden).','Welche Kriterien würden bei Förderbedarf angepasst werden müssen?']}
+      },
+      weiterKarten:[
+        {t:'Fairness prüfen', e:'Eine Gegenprobe, bevor das Raster eingesetzt wird.', p:'Welche Kriterien in diesem Raster könnten bestimmte Kinder benachteiligen? Nenne Beispiele und schlage faire Alternativen vor.\n\n[Raster einfügen]'},
+        {t:'Aufgaben auf Anforderungsstufen verteilen', e:'Eine Prüfung sollte verschiedene Denkstufen abdecken.', p:'Ordne die folgenden Aufgaben den Stufen Wissen, Verstehen, Anwenden und Analysieren zu und zeige, ob die Verteilung ausgewogen ist.\n\n[Aufgaben einfügen]'},
+        {t:'Raster als Schülerversion', e:'Kinder und Jugendliche sollen wissen, wie sie beurteilt werden.', p:'Übersetze das folgende Raster in die Sprache von [Stufe]. Jedes Kriterium als «Ich»-Satz mit einem Beispiel.\n\n[Raster einfügen]'},
+        {t:'Zwei Tools vergleichen', e:'Dieselbe Aufgabe in zwei Tools: Wo unterscheiden sich die Entwürfe?', p:'(Gleicher Prompt wie oben, in einem zweiten Tool oder einer neuen Chat-Sitzung. Vergleiche die Entwürfe und halte fest, was du übernimmst.)'}
+      ],
+      transfer:'Wo könntest du KI nutzen, um Kriterien klarer zu fassen, ohne die Beurteilung abzugeben? Halte Anlass und Kriterium fest.',
+      check:['du keine echten Schülerdaten eingegeben hast.','die Kriterien wirklich beobachtbar sind.','du weisst, was du nicht an die KI delegierst.'],
+      vorlage:'Du bist eine erfahrene Lehrperson ([Stufe], Deutschschweiz). Entwirf ein Beurteilungsraster für [Kompetenz].\nVier Kriterien, je [Anzahl] Stufen mit beobachtbaren Beschreibungen. Gib das Ergebnis als Tabelle aus. Ich prüfe und verantworte die Beurteilung selbst.'
+    },
+
+    { id:'sparring', title:'Sparringspartner', bg:'#6fd3a4', level:2, min:'15–20', sub:'KI als Denkpartner: Was übersehe ich? Was spricht dagegen?',
+      mitnehmen:'Eine Planung oder Entscheidung mit Fragen, Gegenargumenten und Perspektivwechseln schärfen.',
+      brauchst:'Ein KI-Tool deiner Wahl',
+      hinfuehrung:'KI muss nicht nur Texte liefern. Sie kann Rückfragen stellen, Gegenpositionen einnehmen und Schwachstellen suchen, wie eine kritische Kollegin. Du entscheidest, was du davon brauchst.',
+      kartenTitel:'Vier Rollen für deinen Sparringspartner',
+      karten:[
+        {k:'Kritische Kollegin', q:'Stellt Fragen und sucht Schwachstellen.'},
+        {k:'Skeptische Elternperson', q:'Fragt, was Eltern fragen würden.'},
+        {k:'Schulleitung', q:'Prüft Ziel, Rahmen und Aufwand.'},
+        {k:'Kind oder Jugendlicher', q:'Sagt, was langweilig oder unklar ist.'}
+      ],
+      erklaert:[
+        'Typische Fragen: <b>«Welche Aspekte übersehe ich?»</b>, <b>«Was könnte schiefgehen?»</b>, <b>«Welche Gegenargumente gibt es?»</b>',
+        'Gib der KI eine klare <b>Rolle</b> und eine <b>kurze Beschreibung</b> deines Vorhabens, ohne Namen.',
+        'Die KI weiss nichts über deine Klasse. Hinweise sind <b>Denkanstösse</b>, keine Wahrheit.'
+      ],
+      stolper:[
+        '<b>Zu wenig Beschreibung:</b> Die Fragen bleiben allgemein.',
+        '<b>Alles übernehmen:</b> Nicht jeder Hinweis passt zu deiner Klasse.',
+        '<b>Schmeichelei:</b> KI stimmt oft zu. Bitte ausdrücklich um Kritik.',
+        '<b>Echte Personen nennen:</b> Beschreibe Rollen statt Namen.'
+      ],
+      stufen:{
+        1:{ thema:'Bewegtes Lernen im Turnraum', szenario:'Du planst, den Zahlenraum bis 20 in einer Turnstunde mit deiner 1./2. Klasse zu üben. Du möchtest wissen, was schiefgehen könnte.',
+          steps:[
+            {h:'Planung prüfen lassen.', d:'Die Planung ist schon eingebaut.', lab:'Sparring',
+             t:`Du bist eine kritische, aber wohlwollende Kollegin einer 1./2. Klasse. Hier ist meine Planung:
+«Wir üben den Zahlenraum bis 20 in der Turnhalle. Jedes Kind bekommt eine Zahlenkarte. Wir bilden Gruppen, die zusammen 20 ergeben. Danach spielen wir ein Laufspiel, bei dem die Kinder Rechenaufgaben lösen. Dauer: 45 Minuten, 20 Kinder.»
+Stelle mir fünf Fragen, die ich mir vielleicht noch nicht gestellt habe. Nenne danach drei mögliche Schwierigkeiten und je eine Idee, wie ich ihnen begegnen kann.`},
+            {h:'Elternperspektive.', d:'Schlüpfe in eine andere Rolle.', lab:'Perspektive',
+             t:`Du bist ein Elternteil, das Bewegung im Unterricht skeptisch sieht («Sollen sie nicht lieber ruhig rechnen?»). Stelle drei kritische Fragen zu meiner Planung. Ich antworte danach, und du sagst mir, welche Antwort überzeugend war.`}
+          ],
+          beispiel:`Fragen
+1. Was machen Kinder, die Mühe mit dem Zahlenraum haben, während der Gruppen sich bilden?
+2. Wie vermeidest du, dass einzelne Kinder übrig bleiben?
+3. Wie laut wird es, und wie holst du die Klasse zurück?
+4. Wie erkennst du, ob wirklich gerechnet und nicht nur gelaufen wird?
+5. Was passiert bei schlechtem Wetter oder wenn der Turnraum besetzt ist?
+
+Schwierigkeiten und Ideen (Auszug)
+– Kinder fühlen sich ausgeschlossen → feste Gruppen vorab einteilen.`,
+          pruef:['Welche Frage hast du nicht bedacht?','Welcher Hinweis passt nicht zu deiner Klasse?','Was änderst du an der Planung?','Würdest du die Eltern-Perspektive in der Realität ähnlich erleben?'],
+          nachfragen:['Priorisiere: Welche zwei Hinweise sind am wichtigsten?','Stelle drei Fragen aus der Sicht eines Kindes, das nicht gern rennt.','Formuliere die Planung neu, mit den Verbesserungen eingebaut.']},
+        2:{ thema:'Wochenplanarbeit einführen', szenario:'Du möchtest in deiner 5. Klasse die Wochenplanarbeit einführen und prüfen, ob dein Konzept tragfähig ist.',
+          steps:[
+            {h:'Konzept prüfen lassen.', d:'Die Planung ist schon eingebaut.', lab:'Sparring',
+             t:`Du bist eine kritische, aber wohlwollende Kollegin. Hier ist mein Vorhaben:
+«Ich führe in meiner 5. Klasse (22 Kinder) die Wochenplanarbeit ein. Montag erhalten die Kinder einen Plan mit Pflicht- und Wahlaufgaben in Deutsch und Mathematik. Sie arbeiten in 4 Lektionen pro Woche selbstständig. Am Freitag ist ein Kurzcheck. Ich unterstütze einzelne Kinder und mache Kurzinputs.»
+Stelle mir fünf Fragen, die ich mir vielleicht noch nicht gestellt habe. Nenne danach drei mögliche Schwierigkeiten und je eine Idee, wie ich ihnen begegnen kann.`},
+            {h:'Perspektive der Schulleitung.', d:'Schlüpfe in eine andere Rolle.', lab:'Perspektive',
+             t:`Du bist die Schulleiterin. Stelle drei kritische Fragen zu meinem Vorhaben (Ziel, Beurteilung, Aufwand). Ich antworte danach, und du sagst mir, welche Antwort überzeugend war.`}
+          ],
+          beispiel:`Fragen
+1. Wie gehen Kinder vor, die sich schwer selbst organisieren?
+2. Wie stellst du sicher, dass Pflichtaufgaben nicht zu spät erledigt werden?
+3. Was machen schnelle Kinder, wenn sie fertig sind?
+4. Wie verknüpfst du den Kurzcheck mit der Beurteilung?
+5. Wie informierst du die Eltern?
+
+Schwierigkeiten und Ideen (Auszug)
+– Kinder verlieren den Überblick → ein sichtbarer Plan mit Häkchen und Zeitangaben.`,
+          pruef:['Welche Frage hast du nicht bedacht?','Welcher Hinweis passt nicht zu deiner Klasse?','Was änderst du an der Planung?','Was würdest du einer Schulleiterin antworten?'],
+          nachfragen:['Priorisiere die drei wichtigsten Anpassungen.','Formuliere drei Eltern-Fragen und kurze Antworten dazu.','Stelle dir vor, das Vorhaben ist nach vier Wochen gescheitert: Was sind die wahrscheinlichsten Gründe?']},
+        3:{ thema:'Klassenvereinbarung zur Handynutzung', szenario:'Du möchtest mit deiner 7. Klasse eine Vereinbarung zur Handynutzung im Unterricht erarbeiten und prüfst vorab dein Vorgehen.',
+          steps:[
+            {h:'Vorgehen prüfen lassen.', d:'Die Planung ist schon eingebaut.', lab:'Sparring',
+             t:`Du bist eine kritische, aber wohlwollende Kollegin der Sekundarstufe I. Hier ist mein Vorhaben:
+«Ich erarbeite mit meiner 7. Klasse (24 Jugendliche) in zwei Lektionen eine Klassenvereinbarung zur Handynutzung. Die Jugendlichen sammeln in Gruppen Regeln, wir einigen uns im Plenum auf fünf Regeln, die ich auf einem Plakat festhalte. Konsequenzen legen wir gemeinsam fest.»
+Stelle mir fünf Fragen, die ich mir vielleicht noch nicht gestellt habe. Nenne danach drei mögliche Schwierigkeiten und je eine Idee, wie ich ihnen begegnen kann.`},
+            {h:'Pro und Contra.', d:'Lass zwei Rollen gegeneinander argumentieren.', lab:'Pro und Contra',
+             t:`Lass eine Jugendliche («Handys sollen erlaubt sein») und einen Lehrer («Handys stören den Unterricht») je drei Argumente zur Klassenvereinbarung nennen. Gib danach an, wo beide Recht haben könnten und welche Kompromissregel sich daraus ergibt.`}
+          ],
+          beispiel:`Fragen
+1. Was passiert mit Jugendlichen, die sich nicht an die Regeln halten wollen?
+2. Wie stellst du sicher, dass nicht nur die lautesten Stimmen entscheiden?
+3. Gilt die Vereinbarung auch für dich als Lehrperson?
+4. Wie gehst du mit Handys um, die für Aufgaben nützlich sind?
+5. Wie informierst du Eltern und Kolleginnen?
+
+Schwierigkeiten und Ideen (Auszug)
+– Regeln werden nicht ernst genommen → Konsequenzen vorab klar und gemeinsam festlegen.`,
+          pruef:['Welche Frage hast du nicht bedacht?','Welcher Hinweis passt nicht zu deiner Klasse?','Was änderst du an der Planung?','Wie fair erscheinen dir beide Rollen?'],
+          nachfragen:['Priorisiere die wichtigsten Anpassungen.','Formuliere einen Entwurf für die fünf Regeln als Diskussionsgrundlage.','Schlage vor, wie ich die Vereinbarung nach vier Wochen überprüfen kann.']}
+      },
+      weiterKarten:[
+        {t:'Pro und Contra gegeneinander', e:'Zwei Rollen argumentieren, du entscheidest.', p:'Lass zwei Rollen gegeneinander argumentieren: [Rolle 1] und [Rolle 2], je drei Argumente zu: [Vorhaben]. Fasse danach zusammen, was ein Kompromiss sein könnte.'},
+        {t:'Pre-Mortem', e:'Stell dir vor, es ist schiefgegangen. Warum?', p:'Stell dir vor, mein Vorhaben ist nach vier Wochen gescheitert. Nenne die fünf wahrscheinlichsten Gründe und wie ich sie vorab verhindern kann.\n\n[Vorhaben beschreiben]'},
+        {t:'Schwieriges Gespräch üben', e:'Nur mit erfundenen Beispielen. Keine echten Personen.', p:'Spiele eine Person, die [Haltung beschreiben]. Ich übe ein Gespräch zu [Thema]. Antworte kurz und realistisch, und gib mir danach eine Rückmeldung, was gut war.'},
+        {t:'Entscheidungsmatrix', e:'Mehrere Varianten nach Kriterien vergleichen.', p:'Vergleiche meine drei Varianten [A, B, C] nach den Kriterien Aufwand, Lerneffekt und Risiko in einer Tabelle. Gib eine Empfehlung und nenne, was dagegen spricht.'}
+      ],
+      transfer:'Welches Vorhaben der nächsten Wochen möchtest du vorher mit KI durchdenken? Halte Vorhaben und Rolle fest.',
+      check:['du mindestens einen neuen Aspekt entdeckt hast.','du einen Hinweis bewusst verworfen und begründet hast.','du keine echten Namen verwendet hast.'],
+      vorlage:'Du bist [Rolle, z.B. eine kritische, aber wohlwollende Kollegin]. Hier ist mein Vorhaben:\n«[Vorhaben in 3–4 Sätzen]»\nStelle mir fünf Fragen, die ich mir vielleicht noch nicht gestellt habe. Nenne danach drei mögliche Schwierigkeiten und je eine Idee, wie ich ihnen begegnen kann.'
+    },
+
+    { id:'ideen', title:'Ideen & Kreativität', bg:'#ff9a3c', level:1, min:'15', sub:'Einstiege, Spiele, Geschichten, Projekte – schnell viele Ideen.',
+      mitnehmen:'Zehn Ideen in zwei Minuten und eine davon, die du wirklich ausprobierst.',
+      brauchst:'Ein KI-Tool deiner Wahl',
+      hinfuehrung:'Gerade bei knapper Zeit ist eine Ideenliste Gold wert. KI liefert die Masse, du wählst die Qualität. Skeptische Lehrpersonen erleben hier oft schnell einen Nutzen.',
+      kartenTitel:'Vier Wege zu Ideen',
+      karten:[
+        {k:'Viele Ideen', q:'Bitte um zehn statt um eine Idee.'},
+        {k:'Rahmen setzen', q:'Zeit, Material, Gruppengrösse und Raum vorgeben.'},
+        {k:'Kombinieren', q:'Zwei Ideen oder zwei Fächer verbinden.'},
+        {k:'Gegenteil denken', q:'Was wäre die langweiligste Variante? Und das Gegenteil davon?'}
+      ],
+      erklaert:[
+        'Bitte um <b>viele</b> Ideen, nicht um die eine perfekte. Aus einer Liste wählst du aus.',
+        'Gib <b>Einschränkungen</b> mit: Zeit, Material, Gruppengrösse, Raum. Sonst bekommst du Ideen, die du nicht umsetzen kannst.',
+        'Wähle eine Idee aus und <b>entwickle sie im Dialog weiter</b>: Ablauf, Material, Zeit.'
+      ],
+      stolper:[
+        '<b>Zu allgemeine Ideen</b>, weil Rahmen und Stufe fehlen.',
+        '<b>Alles ausprobieren wollen.</b> Wähle eine Idee.',
+        '<b>Nicht umsetzbar:</b> Material oder Zeit fehlt.',
+        '<b>Fakten nicht geprüft</b> bei Geschichten und Sachbezügen.'
+      ],
+      stufen:{
+        1:{ thema:'Unterrichtseinstiege zum Thema «Herbst»', szenario:'Du möchtest deine 1./2. Klasse in das Thema «Herbst» einführen und suchst Einstiege, die Kinder packen.',
+          steps:[
+            {h:'Ideen sammeln.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Ideen',
+             t:`Ich unterrichte eine 1./2. Klasse in der Deutschschweiz. Thema: Herbst. Schlage mir 10 originelle Unterrichtseinstiege vor. Rahmen: höchstens 10 Minuten, wenig Material, 20 Kinder, drinnen oder auf dem Pausenplatz. Gib für jede Idee einen Titel und einen Satz.`},
+            {h:'Eine Idee ausarbeiten.', d:'Wähle die beste Idee aus Schritt 1.', lab:'Ausarbeiten',
+             t:`Arbeite die Idee «[Titel der gewählten Idee]» aus: Ablauf in 4 Schritten, benötigtes Material, was ich vorab vorbereiten muss und eine Frage, mit der ich die Kinder am Schluss zum Reden bringe.`}
+          ],
+          beispiel:`1. Blätter-Detektive: Kinder sammeln Blätter und sortieren sie nach Farbe und Form.
+2. Herbstkiste: Aus einer Kiste werden Gegenstände gezogen (Kastanie, Eichel, Nuss). Kinder raten.
+3. Windmusik: Mit Blättern und Händen Herbstgeräusche nachmachen.
+4. Der Igel sucht sein Nest: Bewegungsgeschichte im Raum.
+…`,
+          pruef:['Passt die Idee zu deinen Kindern und zum Raum?','Brauchst du Material, das du nicht hast?','Sind sachliche Aussagen richtig (z.B. zu Tieren)?','Würde dir die Idee selbst Spass machen?'],
+          nachfragen:['Gib mir drei Ideen, die ohne Material auskommen.','Verbinde zwei Ideen zu einer Doppellektion.','Schlage drei Bewegungsspiele vor, die in einem kleinen Zimmer funktionieren.']},
+        2:{ thema:'Projekt «Pausenplatz neu denken»', szenario:'Deine 5./6. Klasse soll den Pausenplatz neu denken. Du suchst Ideen für ein fächerübergreifendes Projekt.',
+          steps:[
+            {h:'Ideen sammeln.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Ideen',
+             t:`Ich unterrichte eine 5./6. Klasse in der Deutschschweiz. Wir wollen den Pausenplatz unserer Schule neu denken. Schlage mir 10 Projektideen vor, die Fächer verbinden (z.B. Mathematik, Deutsch, Bildnerisches Gestalten, NMG). Rahmen: drei Wochen, kein Budget, Gruppenarbeit. Gib für jede Idee einen Titel, beteiligte Fächer und einen Satz.`},
+            {h:'Eine Idee ausarbeiten.', d:'Wähle die beste Idee aus Schritt 1.', lab:'Ausarbeiten',
+             t:`Arbeite die Idee «[Titel der gewählten Idee]» aus: Ablauf über drei Wochen, Produkt der Kinder, Rollen in der Gruppe, Hilfen für schwächere Gruppen, Präsentation am Schluss.`}
+          ],
+          beispiel:`1. Pausenplatz-Vermessung: Kinder messen Flächen, zeichnen einen Plan im Massstab (Mathematik, BG).
+2. Umfrage zur Pause: Kinder befragen andere Klassen und werten aus (Deutsch, Mathematik).
+3. Modell bauen: Aus Karton ein Modell des neuen Pausenplatzes (BG, Technisches Gestalten).
+4. Vorschlag an die Schulleitung: Brief mit Begründung (Deutsch).
+…`,
+          pruef:['Sind alle Fächer sinnvoll beteiligt?','Ist das Projekt in drei Wochen machbar?','Haben die Kinder echte Mitsprache?','Welche Idee würde die Klasse begeistern?'],
+          nachfragen:['Plane die erste Woche in Lektionen.','Erstelle eine Rollenverteilung für Gruppen von vier Kindern.','Formuliere drei Reflexionsfragen für den Abschluss.']},
+        3:{ thema:'Lernspiel zu Wahlen und Abstimmungen', szenario:'Deine 9. Klasse behandelt politische Mitbestimmung in der Schweiz. Du suchst Lernspiele, die Jugendliche aktivieren.',
+          steps:[
+            {h:'Ideen sammeln.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Ideen',
+             t:`Ich unterrichte eine 9. Klasse in der Deutschschweiz (Thema: politische Mitbestimmung, Wahlen und Abstimmungen in der Schweiz). Schlage mir 10 Lernspiele oder Simulationen vor. Rahmen: eine Doppellektion, 22 Jugendliche, kein Material ausser Papier und Handy. Gib für jede Idee einen Titel, Ablauf in zwei Sätzen und das Lernziel.`},
+            {h:'Eine Idee ausarbeiten.', d:'Wähle die beste Idee aus Schritt 1.', lab:'Ausarbeiten',
+             t:`Arbeite die Idee «[Titel der gewählten Idee]» aus: Spielregeln, Rollen, Ablauf in Phasen, Reflexionsfragen am Schluss und mögliche Stolpersteine. Alle Sachinformationen zur Schweiz müssen stimmen. Markiere Stellen, die ich überprüfen soll.`}
+          ],
+          beispiel:`1. Dorf-Abstimmung: Die Klasse stimmt über ein erfundenes Bauprojekt ab. Gruppen bilden Komitees.
+2. Wahlkampf-Plakat: Parteien-Simulation mit eigenen Programmen.
+3. Podium: Streitgespräch mit festen Rollen.
+4. Wer entscheidet was?: Karten zuordnen (Gemeinde, Kanton, Bund).
+…`,
+          pruef:['Passt das Spiel zum Lernziel?','Sind alle Aussagen zum politischen System korrekt?','Ist die Zeit realistisch?','Fühlen sich alle Jugendlichen einbezogen?'],
+          nachfragen:['Entwickle eine Variante für 12 Jugendliche.','Schlage drei Auswertungsfragen vor, die zum Nachdenken anregen.','Prüfe die Sachaussagen und markiere Unsicheres.']}
+      },
+      weiterKarten:[
+        {t:'Fächerübergreifend', e:'Ein Thema, mehrere Fächer.', p:'Verbinde das Thema [Thema] mit dem Fach [anderes Fach]. Schlage drei Aufgaben vor, die in beiden Fächern ein Lernziel erfüllen.'},
+        {t:'Geschichte schreiben', e:'Ein Thema als Erzählung, für Kinder oder Jugendliche.', p:'Schreibe eine kurze Geschichte (maximal 200 Wörter) für [Stufe], in der [Thema] vorkommt. Die Hauptfigur heisst [erfundener Name].'},
+        {t:'Rollenspiel', e:'Aus einem Thema eine Szene machen.', p:'Entwickle ein Rollenspiel zum Thema [Thema] für [Stufe] mit vier Rollen. Gib jeder Rolle zwei Sätze Anweisung.'},
+        {t:'Verrückte Idee ernst nehmen', e:'Aus einer unkonventionellen Idee wird eine machbare.', p:'Ich habe die verrückte Idee: [Idee]. Wie könnte ich sie so anpassen, dass sie in meiner Klasse funktioniert?'}
+      ],
+      transfer:'Welche Idee probierst du in den nächsten Wochen aus? Halte Idee und Klasse fest.',
+      check:['du mindestens eine Idee ausgewählt hast.','du sie im Dialog weiterentwickelt hast.','die sachlichen Aussagen stimmen.'],
+      vorlage:'Ich unterrichte [Stufe] in der Deutschschweiz. Thema: [Thema]. Schlage mir 10 originelle [Einstiege / Projekte / Lernspiele] vor. Rahmen: [Zeit], [Gruppengrösse], [Material]. Gib für jede Idee einen Titel und einen Satz.'
+    },
+
+    { id:'vorbereitung', title:'Unterrichts&shy;vorbereitung', bg:'#7ec8f0', level:2, min:'25', sub:'Themenübersicht, Lehrplanbezug, Ablauf und Arbeitsblatt.',
+      mitnehmen:'Eine strukturierte Unterrichtseinheit mit Lehrplanbezug und Arbeitsblatt-Entwurf.',
+      brauchst:'Ein KI-Tool deiner Wahl und Zugang zu deinem Lehrplan (z.B. Lehrplan 21)',
+      hinfuehrung:'Wo andere Zeit mit Suchen verbringen, kann KI Struktur liefern: Themenübersicht, Lernziele, Ablauf, Aufgaben. Der Lehrplan bleibt deine Referenz, und du kontrollierst Inhalte und Bezüge.',
+      kartenTitel:'Vier Schritte der Vorbereitung',
+      karten:[
+        {k:'Themenübersicht', q:'Teilthemen und Zusammenhänge sichtbar machen.'},
+        {k:'Lernziele und Lehrplan', q:'Ziele formulieren und Bezüge zum Lehrplan prüfen.'},
+        {k:'Ablauf', q:'Einstieg, Erarbeitung, Sicherung pro Lektion.'},
+        {k:'Aufgaben und Material', q:'Arbeitsblatt, Aufgaben, Lösungen.'}
+      ],
+      erklaert:[
+        'Gib <b>Stufe, Fach, Thema und Lektionszahl</b> an. Die KI kennt deinen Lehrplan nur ungefähr: Bitte sie, passende Kompetenzbereiche <b>vorzuschlagen</b>, und prüfe sie im offiziellen Lehrplan.',
+        'Arbeite in <b>Schritten</b>: Themenübersicht, Lernziele, Ablauf, Aufgaben. Das geht besser als alles in einem Prompt.',
+        'Prüfe Sachinformationen kritisch (siehe Station «Halluzinationen und Quellen»).'
+      ],
+      stolper:[
+        '<b>Lehrplanbezug erfunden:</b> Kompetenzen und Codes immer im Lehrplan nachschlagen.',
+        '<b>Zu dichter Plan:</b> zu viel für 45 Minuten.',
+        '<b>Falsche Sachinfos</b> in Arbeitsblättern.',
+        '<b>Nicht an die Klasse angepasst.</b>'
+      ],
+      stufen:{
+        1:{ thema:'NMG: «Mein Tagesablauf und die Uhr»', szenario:'Du planst für deine 2. Klasse eine Einheit zu Tagesablauf und Uhrzeit (NMG und Mathematik) mit drei Lektionen.',
+          steps:[
+            {h:'Themenübersicht und Lernziele.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Übersicht',
+             t:`Du bist eine erfahrene Lehrperson einer 2. Klasse in der Deutschschweiz. Thema: «Mein Tagesablauf und die Uhr» (NMG und Mathematik).
+Erstelle eine Themenübersicht mit Teilthemen und 4 Lernzielen («Ich kann …»). Schlage passende Kompetenzbereiche des Lehrplans 21 vor und kennzeichne, dass ich sie im Lehrplan nachprüfen muss.`},
+            {h:'Ablauf für drei Lektionen.', d:'Füge die Lernziele aus Schritt 1 ein.', lab:'Ablauf',
+             t:`Plane auf Grundlage dieser Lernziele drei Lektionen à 45 Minuten: Einstieg, Erarbeitung, Sicherung. Gib das Ergebnis als Tabelle aus (Zeit, Aktivität, Material, Sozialform).
+
+[Lernziele einfügen]`},
+            {h:'Arbeitsblatt erstellen.', d:'Für die zweite Lektion.', lab:'Arbeitsblatt',
+             t:`Erstelle ein Arbeitsblatt für Lektion 2: drei Aufgaben zum Lesen der Uhr (volle und halbe Stunden), mit Lösungen und einer kleinen Zeichenaufgabe. Kurze Sätze, grosse Schrift.`}
+          ],
+          beispiel:`Teilthemen: Tagesabschnitte, Uhr lesen (volle und halbe Stunden), Zeitdauer
+Lernziele: Ich kann meinen Tag in Abschnitte einteilen. Ich kann volle und halbe Stunden an der Uhr ablesen. …
+Lehrplanbezug (zu prüfen): NMG und Mathematik, Bereich Zeit und Grössen
+
+Lektion 1: Einstieg Bildgeschichte «Ein Tag von Mia» – Erarbeitung Tagesabschnitte sortieren – Sicherung Tagesplan zeichnen
+…`,
+          pruef:['Stimmen die Lehrplanbezüge im offiziellen Lehrplan?','Passt der Umfang zu 45 Minuten?','Sind die Aufgaben für 2.-Klässler verständlich?','Was würdest du an deine Klasse anpassen?'],
+          nachfragen:['Plane einen Stolperstein-Check: Was könnte Kindern schwerfallen?','Erstelle eine einfachere Variante des Arbeitsblatts.','Formuliere eine Rückmeldekarte für Kinder am Ende der Einheit.']},
+        2:{ thema:'RZG: «Leben auf einer Burg»', szenario:'Du planst für deine 5./6. Klasse eine Einheit zum Leben im Mittelalter mit drei Lektionen.',
+          steps:[
+            {h:'Themenübersicht und Lernziele.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Übersicht',
+             t:`Du bist eine erfahrene Lehrperson einer 5./6. Klasse in der Deutschschweiz. Thema: «Leben auf einer Burg im Mittelalter» (Räume, Zeiten, Gesellschaft).
+Erstelle eine Themenübersicht mit Teilthemen und 4 Lernzielen («Die Schülerinnen und Schüler können …»). Schlage passende Kompetenzbereiche des Lehrplans 21 vor und kennzeichne, dass ich sie im Lehrplan nachprüfen muss.`},
+            {h:'Ablauf für drei Lektionen.', d:'Füge die Lernziele aus Schritt 1 ein.', lab:'Ablauf',
+             t:`Plane auf Grundlage dieser Lernziele drei Lektionen à 45 Minuten: Einstieg, Erarbeitung, Sicherung. Gib das Ergebnis als Tabelle aus (Zeit, Aktivität, Material, Sozialform). Mindestens eine handlungsorientierte Phase.
+
+[Lernziele einfügen]`},
+            {h:'Arbeitsblatt erstellen.', d:'Für die zweite Lektion.', lab:'Arbeitsblatt',
+             t:`Erstelle ein Arbeitsblatt für Lektion 2: Infotext (höchstens 100 Wörter), drei Aufgaben mit steigendem Anspruch, Lösungen. Sachlich korrekt und für Kinder verständlich.`}
+          ],
+          beispiel:`Teilthemen: Wer lebt auf einer Burg?, Räume und ihre Aufgaben, Alltag und Arbeit, Sicherheit
+Lernziele: Ich kann drei Personengruppen der Burg nennen. Ich kann erklären, wozu die Mauern, der Turm und der Graben dienten. …
+Lehrplanbezug (zu prüfen): RZG, Bereich Menschen in Räumen und Zeiten
+
+Lektion 1: Einstieg Burgbild – Erarbeitung Personengruppen zuordnen – Sicherung Plakat
+…`,
+          pruef:['Stimmen die Lehrplanbezüge im offiziellen Lehrplan?','Sind die historischen Aussagen korrekt?','Ist mindestens eine Phase handlungsorientiert?','Passt der Umfang zu 45 Minuten?'],
+          nachfragen:['Ergänze eine Aufgabe für Kinder, die schneller fertig sind.','Plane eine Lernkontrolle von 10 Minuten.','Prüfe den Infotext auf sachliche Fehler und markiere Unsicheres.']},
+        3:{ thema:'Berufliche Orientierung: «Berufe erkunden»', szenario:'Du planst für deine 8. Klasse eine Einheit zur Berufswahl, bevor die Schnupperlehren beginnen.',
+          steps:[
+            {h:'Themenübersicht und Lernziele.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Übersicht',
+             t:`Du bist eine erfahrene Lehrperson einer 8. Klasse der Sekundarstufe I in der Deutschschweiz. Thema: «Berufe erkunden und Berufswahl vorbereiten» (Berufliche Orientierung).
+Erstelle eine Themenübersicht mit Teilthemen und 4 Lernzielen («Ich kann …»). Schlage passende Kompetenzbereiche des Lehrplans 21 vor und kennzeichne, dass ich sie im Lehrplan nachprüfen muss.`},
+            {h:'Ablauf für drei Lektionen.', d:'Füge die Lernziele aus Schritt 1 ein.', lab:'Ablauf',
+             t:`Plane auf Grundlage dieser Lernziele drei Lektionen à 45 Minuten: Einstieg, Erarbeitung, Sicherung. Gib das Ergebnis als Tabelle aus (Zeit, Aktivität, Material, Sozialform). Mit einer Phase, in der Jugendliche selbst recherchieren.
+
+[Lernziele einfügen]`},
+            {h:'Arbeitsblatt erstellen.', d:'Für die zweite Lektion.', lab:'Arbeitsblatt',
+             t:`Erstelle ein Arbeitsblatt für Lektion 2: ein Raster «Beruf im Porträt» (Tätigkeiten, Ausbildung, Anforderungen, Vor- und Nachteile) mit drei Reflexionsfragen. Ohne erfundene Zahlen.`}
+          ],
+          beispiel:`Teilthemen: Eigene Interessen und Stärken, Berufsfelder, Ausbildungswege (Lehre, Mittelschule), Informationsquellen
+Lernziele: Ich kann meine Interessen benennen. Ich kann zwei Berufe mit ihren Anforderungen beschreiben. …
+Lehrplanbezug (zu prüfen): Berufliche Orientierung, Bereich Selbstkenntnis und Berufswelt
+
+Lektion 1: Einstieg Interessen-Check – Erarbeitung Berufsfelder-Rundgang – Sicherung Ideen-Liste
+…`,
+          pruef:['Stimmen die Lehrplanbezüge im offiziellen Lehrplan?','Sind Aussagen zu Ausbildungswegen aktuell und für deinen Kanton richtig?','Ist die Recherchephase realistisch?','Passt der Umfang zu 45 Minuten?'],
+          nachfragen:['Plane eine Hausaufgabe zur Vorbereitung auf die Schnupperlehre.','Erstelle eine Checkliste mit Fragen an den Schnupperbetrieb.','Prüfe den Plan auf Aussagen, die ich im Kanton nachprüfen muss.']}
+      },
+      weiterKarten:[
+        {t:'Lehrplanbezug prüfen', e:'Die KI schlägt vor, du prüfst im Lehrplan.', p:'Schlage zu den folgenden Lernzielen passende Kompetenzbereiche des Lehrplans 21 vor und markiere Unsicheres, das ich nachprüfen muss.\n\n[Lernziele einfügen]'},
+        {t:'Arbeitsblatt mit Lösungen', e:'Aus der Planung wird Material.', p:'Erstelle zu Lektion [Nummer] ein Arbeitsblatt für [Stufe] mit Aufgaben steigenden Anspruchs und Lösungen. Sachlich korrekt, kurze Sätze.'},
+        {t:'Differenzierung ergänzen', e:'Siehe Station «Differenzieren».', p:'Schlage zu den folgenden Aufgaben je eine stützende und eine fordernde Variante zum gleichen Lernziel vor.\n\n[Aufgaben einfügen]'},
+        {t:'Stolpersteine', e:'Vorher wissen, wo Kinder hängenbleiben.', p:'Welche Stolpersteine könnte diese Einheit für Kinder haben? Gib je einen Hinweis, wie ich im Unterricht darauf reagieren kann.\n\n[Einheit einfügen]'}
+      ],
+      transfer:'Welche Einheit planst du als Nächstes mit KI-Unterstützung vor? Halte Thema und Lektionszahl fest.',
+      check:['der Lehrplanbezug im offiziellen Lehrplan stimmt.','die Sachinformationen stimmen.','die Planung zu deiner Klasse passt.'],
+      vorlage:'Du bist eine erfahrene Lehrperson einer [Stufe] in der Deutschschweiz. Thema: [Thema] ([Fach]).\nErstelle eine Themenübersicht mit Teilthemen und [Anzahl] Lernzielen. Schlage passende Kompetenzbereiche des Lehrplans 21 vor und kennzeichne, dass ich sie nachprüfen muss. Plane danach [Anzahl] Lektionen à [Dauer] als Tabelle.'
+    },
+
+    { id:'halluzinationen', title:'Halluzinationen & Quellen', bg:'#d4a5f0', level:2, min:'20', sub:'KI klingt überzeugend – auch wenn sie falsch liegt.',
+      mitnehmen:'Eine Prüfroutine: Was übernehme ich? Was kontrolliere ich? Wo brauche ich Quellen?',
+      brauchst:'Ein KI-Tool deiner Wahl und eine Suchmaschine',
+      hinfuehrung:'KI erfindet manchmal Fakten, Zitate oder Quellen, mit grosser Selbstsicherheit. Wer das kennt, nutzt KI sicherer und gibt Kindern und Jugendlichen bessere Informationen weiter.',
+      kartenTitel:'Drei Werkzeuge, drei Arbeitsweisen',
+      karten:[
+        {k:'Chatbot', q:'Erzeugt Text aus Wahrscheinlichkeiten. Klingt gut, kann falsch sein.'},
+        {k:'Suchmaschine', q:'Findet bestehende Seiten. Du beurteilst die Quelle.'},
+        {k:'KI-Recherche', q:'Verbindet beides und nennt Quellen. Die Quellen prüfst du trotzdem.'}
+      ],
+      erklaert:[
+        'Risikobereiche: <b>Jahreszahlen, Zitate, Literaturangaben, lokale Details, Rechtliches</b> und Zahlen aller Art.',
+        'Faustregel: <b>Je wichtiger und überprüfbarer die Aussage, desto sicherer kontrollieren.</b> Eine Unterrichtsidee kannst du locker übernehmen, eine Jahreszahl nicht.',
+        'Frage nach <b>Quellen</b> und prüfe, ob es sie wirklich gibt. KI erfindet manchmal Titel, Autorinnen und Links.'
+      ],
+      stolper:[
+        '<b>Überzeugender Ton</b> als Beweis nehmen.',
+        '<b>Quellen nicht öffnen.</b> Sie existieren manchmal nicht.',
+        '<b>Alte Informationen:</b> Das Wissen der KI ist nicht immer aktuell.',
+        '<b>Nur eine Quelle.</b> Vergleiche mit einer zweiten.'
+      ],
+      stufen:{
+        1:{ thema:'Tierwissen für Kinder prüfen', szenario:'Du möchtest für deine 2. Klasse einen kurzen Informationstext über Igel verwenden und willst sicher sein, dass er stimmt.',
+          steps:[
+            {h:'Frage stellen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Frage',
+             t:`Was darf man einem Igel im Garten im Herbst zu fressen und zu trinken geben? Antworte in fünf kurzen Sätzen für Eltern von Kindergartenkindern.`},
+            {h:'Aussagen zerlegen.', d:'Die KI soll ihre Antwort selbst einordnen.', lab:'Einordnen',
+             t:`Teile deine Antwort in einzelne Aussagen. Bewerte jede Aussage mit: sicher / unsicher / nicht belegbar. Nenne, wo ich sie nachprüfen kann.`},
+            {h:'Nachprüfen.', d:'Prüfe zwei Aussagen mit einer Suchmaschine oder einer seriösen Quelle (z.B. Igelstation, Tierschutzorganisation, Museum). Stimmt die KI?'}
+          ],
+          exTitle:'Konstruiertes Beispiel zum Üben',
+          exNote:'Diese Antwort ist ein Beispiel, um Prüfen zu üben, und keine echte KI-Antwort.',
+          beispiel:`Mögliche Antwort (konstruiert)
+Igel lieben Milch und Brot. Man darf sie im Garten damit füttern. Im Herbst brauchen sie viel Futter, um Winterschlaf zu halten. Wasser in einem flachen Schälchen ist hilfreich.
+
+Auflösung
+Milch ist für Igel ungeeignet (sie vertragen sie nicht), und Brot ist kein passendes Futter. Der Rest stimmt: Wasser ist hilfreich, und Igel brauchen im Herbst Reserven.`,
+          pruef:['Welche Aussage würdest du ungeprüft übernehmen und welche nicht?','Hast du zwei Aussagen mit einer unabhängigen Quelle verglichen?','Gab die KI Quellen an, und existieren sie?','Wie würdest du Kindern erklären, dass man nachprüft?'],
+          nachfragen:['Erkläre, woran man falsche Informationen im Internet erkennt, für Kinder einer 2. Klasse in vier Sätzen.','Gib mir drei Quellen, die ich für Kinderwissen über Igel nutzen kann.','Bist du sicher? Prüfe deine Antwort noch einmal.']},
+        2:{ thema:'Geschichtsfakten prüfen', szenario:'Du möchtest für deine 5./6. Klasse den Bundesbrief 1291 erklären und willst sicher sein, dass die Angaben stimmen.',
+          steps:[
+            {h:'Frage stellen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Frage',
+             t:`Erkläre den Bundesbrief von 1291 in fünf Sätzen für Kinder einer 5./6. Klasse und nenne für jede Aussage eine Quelle.`},
+            {h:'Aussagen zerlegen.', d:'Die KI soll ihre Antwort selbst einordnen.', lab:'Einordnen',
+             t:`Teile deine Antwort in einzelne Aussagen. Bewerte jede Aussage mit: sicher / unsicher / nicht belegbar. Nenne, wo ich sie nachprüfen kann.`},
+            {h:'Nachprüfen.', d:'Prüfe zwei Aussagen mit einer seriösen Quelle (z.B. Museum, Staatsarchiv, Lehrmittel). Stimmt die KI? Existieren die genannten Quellen?'}
+          ],
+          exTitle:'Konstruiertes Beispiel zum Üben',
+          exNote:'Diese Antwort ist ein Beispiel, um Prüfen zu üben, und keine echte KI-Antwort.',
+          beispiel:`Mögliche Antwort (konstruiert)
+Der Bundesbrief wurde am 1. August 1291 in Brunnen unterzeichnet. Uri, Schwyz und Unterwalden versprachen sich gegenseitige Hilfe. Der Brief gilt als Gründungsdokument der Schweiz.
+
+Auflösung
+Der Brief nennt nur «Anfang August 1291». Der 1. August als genaues Datum ist eine spätere Festlegung für den Nationalfeiertag. Der Ort der Unterzeichnung ist nicht überliefert. Der Rest stimmt in groben Zügen.`,
+          pruef:['Welche Aussage stimmt nur teilweise?','Gibt es die genannten Quellen wirklich?','Wie unterscheiden sich Quellen von Lehrmittel und Chatbot?','Wie erklärst du Kindern, dass auch Erwachsene prüfen?'],
+          nachfragen:['Erkläre den Unterschied zwischen Chronik, Bundesbrief und Legende in vier Sätzen.','Gib mir drei seriöse Quellen für den Bundesbrief.','Bist du sicher? Prüfe deine Antwort noch einmal.']},
+        3:{ thema:'Quellen und Zahlen prüfen', szenario:'Für deine 9. Klasse recherchierst du zu Bildschirmzeit bei Jugendlichen. Die KI soll Quellen liefern. Du prüfst, ob es sie gibt.',
+          steps:[
+            {h:'Frage stellen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Frage',
+             t:`Nenne mir drei wissenschaftliche Studien oder Berichte zum Thema Bildschirmzeit und Schlaf bei Jugendlichen in der Schweiz. Gib für jede Quelle Titel, Autorinnen, Jahr und eine kurze Zusammenfassung an.`},
+            {h:'Quellen kritisch ansehen.', d:'Die KI soll ihre Antwort selbst einordnen.', lab:'Einordnen',
+             t:`Bewerte für jede genannte Quelle, wie sicher du bist, dass sie existiert (sicher / unsicher / nicht belegbar). Sage ehrlich, wenn du dir bei einer Angabe nicht sicher bist.`},
+            {h:'Nachprüfen.', d:'Suche jede Quelle im Netz (z.B. Bibliothekskatalog, Google Scholar, Website des Bundes). Existiert sie? Stimmen Titel, Jahr und Inhalt?'}
+          ],
+          exTitle:'Konstruiertes Beispiel zum Üben',
+          exNote:'Diese Quelle ist erfunden und dient nur zum Üben. Prüfe sie wie eine echte Quelle.',
+          beispiel:`Mögliche Antwort (konstruiert)
+Müller, A. & Keller, T. (2021): «Bildschirmzeit und Schlafqualität bei Jugendlichen in der Schweiz». Swiss Journal of Youth Research, 14(2), 55–72. Die Studie zeigt, dass mehr als zwei Stunden Bildschirmzeit am Abend den Schlaf um durchschnittlich 40 Minuten verkürzen.
+
+Auflösung
+Die Quelle ist erfunden. Sie sieht plausibel aus (Titel, Autorinnen, Zeitschrift, Seiten), lässt sich aber nicht finden. Solche Angaben lassen sich nur durch eine Suche im Katalog oder bei der Zeitschrift überprüfen.`,
+          pruef:['Hast du jede Quelle im Netz gefunden?','Stimmen Titel, Autoren und Jahr?','Welche Zahlen stammen von der KI und welche aus einer geprüften Quelle?','Welche Regel stellst du für Recherchen in deiner Klasse auf?'],
+          nachfragen:['Nenne mir stattdessen drei Organisationen oder Behörden, bei denen ich solche Daten selbst nachschlagen kann.','Erkläre in vier Sätzen, warum KI Quellen erfinden kann.','Bist du sicher? Prüfe deine Antwort noch einmal.']}
+      },
+      weiterKarten:[
+        {t:'Absichtlich einen Fehler einbauen', e:'Wer Fehler sucht, schärft den Blick.', p:'Schreibe einen kurzen Sachtext (80 Wörter) zum Thema [Thema] für [Stufe] und baue genau einen sachlichen Fehler ein. Verrate mir den Fehler nicht, ich suche ihn.'},
+        {t:'Chatbot gegen Suchmaschine', e:'Dieselbe Frage, zwei Wege.', p:'(Stelle dieselbe Frage in einer Suchmaschine und im Chatbot. Wo war die Antwort schneller, wo verlässlicher, wo mit Quelle?)'},
+        {t:'Quellenprüfung', e:'Eine Routine für alle Recherchen.', p:'Gib mir eine Checkliste mit fünf Fragen, mit denen ich eine Quelle im Netz prüfe (Absender, Datum, Belege, Absicht, zweite Quelle). Für [Stufe] verständlich formuliert.'},
+        {t:'Eigene Prüfregel', e:'Was prüfst du künftig immer nach?', p:'Hilf mir, drei persönliche Prüfregeln für KI-Antworten zu formulieren, die ich in meinem Unterrichtsalltag anwenden kann.'}
+      ],
+      transfer:'Welche Informationen aus KI-Antworten prüfst du künftig immer nach? Halte deine Prüfregel fest.',
+      check:['du mindestens einen Fehler oder eine erfundene Quelle gefunden hast.','du zwei Aussagen mit einer unabhängigen Quelle verglichen hast.','du eine eigene Prüfregel formuliert hast.'],
+      vorlage:'Erkläre mir [Thema] in [Anzahl] Sätzen für [Stufe] und nenne für jede Aussage eine Quelle.\nTeile danach deine Antwort in einzelne Aussagen und bewerte jede mit: sicher / unsicher / nicht belegbar.'
+    },
+
+    { id:'schueler', title:'KI & Schüler:innen', bg:'#c6c6c6', level:3, min:'25', sub:'Was sollen Kinder über KI verstehen? Wann hilft sie, wann nimmt sie Lernen ab?',
+      mitnehmen:'Eigene Leitlinien für den Umgang mit KI in deiner Klasse, passend zur Stufe.',
+      brauchst:'Ein Gegenüber zum Diskutieren (zu zweit oder zu dritt). Ein KI-Tool ist optional.',
+      hinfuehrung:'Auch ohne KI-Tools im Klassenzimmer ist KI ein Thema der Kinder. Bei Zyklus 1 und 2 geht es weniger um Anwendungen als um Grundverständnis und kritisches Denken, bei Zyklus 3 zusätzlich um Transparenz und Verantwortung.',
+      kartenTitel:'Fünf Dimensionen für den Unterricht',
+      karten:[
+        {k:'Wissen über KI', q:'Funktionen, Grenzen und Dimensionen verstehen.'},
+        {k:'Anwendungswissen', q:'Tools bewusst und sicher nutzen können.'},
+        {k:'Reflexion', q:'Über den Wert des Lernens nachdenken und diskutieren.'},
+        {k:'Lern- und Tutorsysteme', q:'Lernen durch KI-gestützte Systeme unterstützen.'},
+        {k:'Analoges Lernen', q:'Lerngelegenheiten, in denen analoges Lernen wertvoll bleibt.'}
+      ],
+      erklaert:[
+        'Sechs Grundsätze für Schülerinnen und Schüler: <b>Ressourcen schonen</b>, <b>achtsam mit Daten umgehen</b>, <b>Quellen kritisch prüfen</b>, <b>eigenständig denken</b>, <b>transparent sein</b> (KI-Nutzung kennzeichnen), <b>Verantwortung übernehmen</b>.',
+        'Das Bild vom <b>Roboter im Fitnessstudio</b>: Wer die Aufgaben delegiert, trainiert den eigenen Lernmuskel nicht.',
+        'Kernfrage: <b>Wann unterstützt KI das Lernen, wann ersetzt sie es?</b> Das beantwortet jede Klasse und Stufe anders.'
+      ],
+      stolper:[
+        '<b>Verbote ohne Erklärung:</b> Kinder umgehen sie.',
+        '<b>Tool-Fokus:</b> Wichtiger als ein Tool ist, was Kinder über KI verstehen.',
+        '<b>Datenschutz vergessen:</b> Altersvorgaben, Einverständnis, Pseudonyme.',
+        '<b>Eltern nicht einbeziehen.</b>'
+      ],
+      stufen:{
+        1:{ thema:'KI kindgerecht erklären', szenario:'Du möchtest deiner 1./2. Klasse erklären, was eine KI ist, und drei einfache Regeln festlegen. Kinder dieser Stufe nutzen KI nicht selbst, kennen sie aber aus dem Alltag (Sprachassistent, Smartphone).',
+          steps:[
+            {h:'Situationen diskutieren.', d:'Besprecht zu zweit: Was würdest du Kindern in diesen Situationen sagen? (a) Ein Kind erzählt, es habe die KI auf dem Handy der Eltern gefragt, was 8 + 5 ist. (b) Ein Kind sagt: «Alexa weiss alles.» (c) Ein Kind fragt, ob die KI lebendig ist.'},
+            {h:'Erklärung formulieren.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Erklärung',
+             t:`Erkläre Kindern einer 1./2. Klasse in höchstens 80 Wörtern, was eine KI (zum Beispiel ein Sprachassistent) ist. Verwende ein Bild aus dem Alltag. Betone, dass die KI nicht alles weiss und sich irren kann. Hochdeutsch, ganz einfache Sprache.`},
+            {h:'Regeln formulieren.', d:'Entwickelt drei Regeln für die Klasse.', lab:'Regeln',
+             t:`Formuliere drei einfache Regeln für eine 1./2. Klasse zum Umgang mit KI und Sprachassistenten, in Kindersprache («Wir …»). Eine Regel zu Daten, eine zum Nachfragen, eine zum selbst Denken.`}
+          ],
+          beispiel:`Erklärung (Beispiel)
+Eine KI ist wie ein sehr fleissiger Papagei. Er hat ganz viele Sätze gehört und kann sie neu zusammensetzen. Aber er versteht nicht immer, was er sagt. Darum kann er sich auch irren. Deshalb fragen wir nach.
+
+Regeln (Beispiel)
+Wir geben der KI nie unseren Namen oder unsere Adresse.
+Wir fragen eine Person, wenn wir nicht sicher sind.
+Zuerst denke ich selbst, dann frage ich.`,
+          pruef:['Versteht ein Kind das Bild?','Sind die Regeln für 7-Jährige verständlich?','Welche Frage würden Kinder zusätzlich stellen?','Was fehlt dir, um das in der Klasse zu besprechen?'],
+          nachfragen:['Schlage ein Gesprächsspiel vor, mit dem Kinder erleben, dass KI sich irren kann.','Formuliere einen Elternbrief in fünf Sätzen, der erklärt, wie wir in der Klasse über KI sprechen.','Gib mir drei Bilderbücher oder Spiele zum Thema.']},
+        2:{ thema:'Klassenregeln und Prüfen üben', szenario:'Du möchtest mit deiner 5./6. Klasse über den Umgang mit KI sprechen und gemeinsam Regeln festlegen.',
+          steps:[
+            {h:'Situationen diskutieren.', d:'Besprecht zu zweit: Wann hilft KI beim Lernen, wann nicht? (a) Ein Kind lässt einen Text schreiben und gibt ihn als eigenen ab. (b) Ein Kind lässt sich einen Fehler in der Mathematikaufgabe erklären. (c) Ein Kind fragt die KI nach der Lösung der Hausaufgabe.'},
+            {h:'Regeln formulieren.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Regeln',
+             t:`Du bist eine erfahrene Lehrperson einer 5./6. Klasse. Formuliere fünf Klassenregeln zum Umgang mit KI in Kindersprache, basierend auf diesen Grundsätzen: Daten schützen, Quellen prüfen, selbst denken, ehrlich sagen, wenn KI geholfen hat, Verantwortung übernehmen. Je ein Beispiel dazu.`},
+            {h:'Ampel entwickeln.', d:'Wann ist KI erlaubt?', lab:'Ampel',
+             t:`Erstelle eine KI-Ampel für eine 5./6. Klasse: Grün (erlaubt), Gelb (nur mit Absprache), Rot (nicht erlaubt) mit je drei Beispielen aus dem Schulalltag.`}
+          ],
+          beispiel:`Regeln (Beispiel)
+1. Ich gebe der KI keine persönlichen Angaben (Name, Adresse, Schule).
+2. Ich prüfe, was die KI sagt, mit einem Buch oder einer zweiten Quelle.
+3. Ich denke zuerst selbst, dann frage ich die KI.
+4. Ich sage ehrlich, wenn mir die KI geholfen hat.
+5. Ich bin verantwortlich für das, was ich abgebe.
+
+Ampel (Auszug)
+Grün: Wörter erklären lassen. Gelb: Text überarbeiten lassen. Rot: Hausaufgabe lösen lassen und als eigene abgeben.`,
+          pruef:['Wären die Regeln für Kinder verständlich und kontrollierbar?','Was bedeutet «Gelb» konkret für dich?','Wie sprichst du mit den Eltern darüber?','Welche Regel ist dir am wichtigsten?'],
+          nachfragen:['Formuliere eine Reflexionsfrage, die Kinder nach einer KI-Nutzung beantworten.','Erstelle ein kurzes Rollenspiel zu «Rot»-Situationen.','Schreibe eine Info an die Eltern in fünf Sätzen.']},
+        3:{ thema:'Transparenz und Verantwortung', szenario:'Deine 8./9. Klasse nutzt KI bereits. Du möchtest klären, wie sie das kennzeichnen sollen und wann KI das Lernen unterstützt.',
+          steps:[
+            {h:'Situationen diskutieren.', d:'Besprecht zu zweit: Was ist legitim, was nicht? (a) Jugendliche lassen sich einen Text überarbeiten und geben ihn ab. (b) Jugendliche lassen sich Lernkarten für eine Prüfung erstellen. (c) Eine Lehrperson nutzt KI, um Rückmeldungen zu Texten zu schreiben.'},
+            {h:'Deklaration entwerfen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Deklaration',
+             t:`Entwirf eine kurze Vorlage («KI-Deklaration»), mit der Jugendliche einer 8./9. Klasse angeben, wie sie KI bei einer Arbeit genutzt haben (Tool, Zweck, was übernommen, was selbst geprüft oder verändert). Höchstens fünf Zeilen.`},
+            {h:'Leitlinien entwickeln.', d:'Für deine Klasse.', lab:'Leitlinien',
+             t:`Formuliere für eine 8./9. Klasse fünf Leitlinien zum Umgang mit KI bei Hausaufgaben und Prüfungsvorbereitung, die Transparenz, Verantwortung und eigenes Denken betonen. Je ein Beispiel dazu.`}
+          ],
+          beispiel:`Deklaration (Beispiel)
+Tool: [Name des Tools]
+Zweck: Ideen sammeln / Text überarbeiten / Fehler erklären
+Übernommen: [was genau]
+Von mir geprüft oder verändert: [was genau]
+
+Leitlinie (Beispiel)
+Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ich nicht selbst verstanden habe.`,
+          pruef:['Ist die Deklaration einfach genug, dass Jugendliche sie ausfüllen?','Wo ziehst du die Grenze zwischen Hilfe und Täuschung?','Wie überprüfst du das, ohne zu überwachen?','Wie gehst du als Lehrperson selbst transparent mit KI um?'],
+          nachfragen:['Schreibe drei Aufgabenformate, bei denen KI-Nutzung das Lernen nicht ersetzt.','Formuliere einen Elternbrief zum Umgang mit KI an der Schule.','Welche Datenschutzpunkte müssen Jugendliche kennen (Alter, Konto, Pseudonym)?']}
+      },
+      weiterKarten:[
+        {t:'Ampel-System', e:'Wann ist KI erlaubt, wann nur mit Absprache, wann nicht?', p:'Erstelle eine KI-Ampel für [Stufe] mit je drei Beispielen für Grün, Gelb und Rot aus dem Schulalltag.'},
+        {t:'Lektion «Kann ich der KI glauben?»', e:'Eine Lektion, in der Kinder Antworten prüfen.', p:'Plane eine Lektion (45 Minuten) für [Stufe] zum Thema «Kann ich der KI glauben?» mit einem Einstieg, einer Prüfaufgabe in Gruppen und einer Reflexion.'},
+        {t:'Eltern einbeziehen', e:'Eltern wissen oft nicht, wie in der Klasse mit KI umgegangen wird.', p:'Schreibe eine kurze Information für Eltern (höchstens 120 Wörter) zum Umgang mit KI in meiner Klasse [Stufe]. Sachlich, verständlich, ohne Fachwörter.'},
+        {t:'Eigene Haltung klären', e:'Was möchtest du Kindern über KI mitgeben?', p:'Ich möchte meinen Schülerinnen und Schülern in drei Sätzen erklären, was KI kann und was nicht. Hilf mir, eine ehrliche und ausgewogene Formulierung für [Stufe] zu finden.'}
+      ],
+      transfer:'Welche Regel oder Frage bringst du in den nächsten Wochen in deine Klasse? Halte sie fest.',
+      check:['ihr mindestens zwei Regeln formuliert habt.','du erklären kannst, wann KI Lernen unterstützt und wann sie es ersetzt.','du weisst, was du Kindern über KI vermitteln willst.'],
+      vorlage:'Formuliere für eine [Stufe] [Anzahl] Regeln zum Umgang mit KI in Kindersprache. Berücksichtige: Daten schützen, Quellen prüfen, selbst denken, ehrlich sagen, wenn KI geholfen hat, Verantwortung übernehmen. Je ein Beispiel dazu.'
+    }
+  ];
+
+  /* Neue Schritte je Station: Transfer («Eigener Fall») und Weiterdenken */
+  var EXTRA = {
+    prompting:{
+      min:'35–40',
+      vorlage:'Du bist [Rolle, z.B. eine erfahrene Lehrperson einer [Stufe] in der Deutschschweiz].\n[Auftrag: Erstelle … / Schreibe … / Entwirf …]\nKontext: [Für wen, Vorwissen, Rahmen]\nKriterien: [Länge, Niveau, Sprache, Inhalt]\nAusgabeformat: [Titel, Aufgaben, Lösungen, Tabelle …]',
+      eigen:{ titel:'Dein eigener Prompt nach dem Schema', auftrag:'Schreibe einen Prompt für eine echte Aufgabe aus deinem Alltag. Dieses Mal fügst du die fünf Teile selbst zusammen. Eine Vorlage zum Kopieren gibt es nicht.',
+        faelle:['Ein Arbeitsblatt oder eine Aufgabe für die nächste Woche','Eine Information an Eltern oder Kolleginnen','Ein Einstieg in ein neues Thema'],
+        felder:[
+          {key:'rolle', label:'Rolle', leit:'Wer soll die KI sein?', hilfe:['Du bist eine erfahrene Lehrperson einer [Klasse] in der Deutschschweiz.','Du bist eine Lektorin, die Texte für Kinder prüft.']},
+          {key:'auftrag', label:'Auftrag', leit:'Was genau soll entstehen? Beginne mit einem Verb.', hilfe:['Erstelle …, Schreibe …, Entwirf … Nenne das Produkt und den Umfang (z.B. «ein Arbeitsblatt mit drei Aufgaben»).']},
+          {key:'kontext', label:'Kontext', pre:'Kontext: ', leit:'Für wen und in welcher Situation? Was ist das Vorwissen?', hilfe:['Die Klasse kennt … aber noch nicht … Wir arbeiten in … (Einzelarbeit, Gruppen).','Besonderheit: … (z.B. Kinder mit Deutsch als Zweitsprache).']},
+          {key:'kriterien', label:'Kriterien', pre:'Kriterien: ', leit:'Worauf kommt es an?', hilfe:['Länge, Niveau, Sprache, Fachbegriffe, Hochdeutsch mit «ss», sachlich korrekt.']},
+          {key:'format', label:'Ausgabeformat', pre:'Ausgabeformat: ', leit:'In welcher Form soll das Ergebnis kommen?', hilfe:['Titel, Infotext, drei Aufgaben, Lösungen am Schluss. Als Tabelle, nummerierte Liste oder Fliesstext.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'Ein guter Prompt spart Zeit und liefert brauchbare Entwürfe. Gleichzeitig kann man sich daran gewöhnen, nur noch Aufträge zu formulieren, statt selbst zu denken und zu schreiben.', fragen:['Welche Aufgaben delegierst du gern, welche möchtest du nicht abgeben?','Woran merkst du, dass du dich zu stark auf die KI verlässt?']},
+        {t:'Ethik und Fairness', text:'KI antwortet auf Grundlage von Daten, die nicht neutral sind. Je nach Formulierung kann sie Klischees verstärken, etwa bei Rollen, Herkunft oder Geschlecht in Beispielen für Arbeitsblätter.', fragen:['Wo könnten Beispiele aus der KI Kinder ausschliessen oder stereotyp darstellen?','Wie kannst du Prompts so formulieren, dass Vielfalt mitgedacht wird?']},
+        {t:'Ähnliche Szenarien', text:'Das Schema funktioniert auch ausserhalb des Unterrichts: für Mails, Konzepte, Protokolle oder Sitzungsvorbereitungen.', fragen:['Wo schreibst du im Berufsalltag regelmässig ähnliche Texte?','Für welche Aufgabe wäre ein Prompt ungeeignet, weil Nähe oder Vertraulichkeit zählt?']},
+        {t:'Kinder und Lernen', text:'Kinder werden bald selbst prompten. Wer ein Ziel klar formulieren kann, lernt auch, klar zu denken. Wenn Kinder nur Prompts kopieren, verlieren sie den Zugang zur Aufgabe.', fragen:['Was könnten Kinder aus dem Schema Rolle – Auftrag – Kontext lernen, das über KI hinausgeht?','Ab welcher Stufe und in welcher Form wäre das ein Thema in deiner Klasse?']}
+      ]},
+
+    eltern:{
+      min:'25–30',
+      eigen:{ titel:'Dein eigener Elterntext', auftrag:'Schreibe einen Prompt für einen Elterntext, den du in den nächsten Wochen wirklich brauchst.',
+        faelle:['Einladung zum Elternabend','Information zu einem Ausflug oder Projekt','Rückmeldung zu einem Anlass (ohne Namen)'],
+        felder:[
+          {key:'anlass', label:'Anlass und Zielgruppe', leit:'Wozu schreibst du, und wer liest es?', hilfe:['Du bist Klassenlehrperson einer [Stufe]. Schreibe eine Einladung zum Elternabend.','Die Eltern sprechen teilweise wenig Deutsch.']},
+          {key:'fakten', label:'Fakten', pre:'Fakten: ', leit:'Datum, Zeit, Ort, Kosten, Frist: alles, was stimmen muss.', hilfe:['Nenne nur, was du sicher weisst. Offenes markierst du mit [ ], damit die KI nichts erfindet.']},
+          {key:'ton', label:'Ton und Länge', pre:'Ton und Länge: ', leit:'Wie soll der Text klingen und wie lang sein?', hilfe:['freundlich und klar, maximal 150 Wörter, Anrede «Sie», Hochdeutsch mit «ss».']},
+          {key:'struktur', label:'Struktur', pre:'Struktur: ', leit:'In welche Abschnitte soll der Text gegliedert sein?', hilfe:['Was, Wann und Wo, Was mitbringen, Kontakt.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'Entwürfe sparen Zeit, besonders bei Übersetzungen und Leichter Sprache. Falsche Fakten, ein unpassender Ton oder eine ungeprüfte Übersetzung können jedoch Missverständnisse auslösen, die das Vertrauen belasten.', fragen:['Bei welchen Elterntexten würdest du KI nutzen, bei welchen nicht?','Wer prüft bei dir, bevor ein Text verschickt wird?']},
+        {t:'Ethik und Fairness', text:'Mehrsprachige Eltern profitieren von Übersetzungen. Ob sie wirklich verstehen, was gemeint ist, hängt aber von der Qualität ab. Zudem stellt sich die Frage, ob Eltern erfahren sollen, dass ein Text mit KI-Hilfe entstanden ist.', fragen:['Würdest du Eltern mitteilen, dass ein Text mit KI-Hilfe entstand? Warum (nicht)?','Was brauchst du, um eine Übersetzung für Familien verantwortbar zu verschicken?']},
+        {t:'Ähnliche Szenarien', text:'Dieselbe Technik hilft bei Einladungen, Wochenplänen, Mitteilungen im Klassenchat, Protokollen oder Rückmeldungen an Kolleginnen.', fragen:['Wo schreibst du regelmässig ähnliche Texte?','Welche Vorlage würdest du anlegen, um sie wiederzuverwenden?']},
+        {t:'Beziehung und Ton', text:'Elternarbeit lebt von Beziehung. Ein Text, der zu glatt oder unpersönlich klingt, wirkt schnell fremd. Der persönliche Ton bleibt eine Aufgabe der Lehrperson.', fragen:['Woran erkennen Eltern, dass der Text von dir stammt?','Was würdest du nie von einer KI schreiben lassen, zum Beispiel heikle Rückmeldungen?']}
+      ]},
+
+    differenzieren:{
+      min:'30',
+      eigen:{ titel:'Deine eigene Aufgabe in drei Niveaus', auftrag:'Wähle eine Aufgabe aus deinem Unterricht und schreibe selbst den Prompt, der sie auf mehrere Niveaus bringt.',
+        faelle:['Eine Aufgabe aus dem Mathematikunterricht','Ein Text oder eine Leseaufgabe','Ein Schreibauftrag'],
+        felder:[
+          {key:'aufgabe', label:'Aufgabe und Lernziel', pre:'Aufgabe und Lernziel: ', leit:'Welche Aufgabe, welches Lernziel? Für welche Stufe?', hilfe:['Hier ist eine Aufgabe für [Stufe] ([Fach]). Lernziel: [Lernziel]. Aufgabe: …']},
+          {key:'gruppe', label:'Zielgruppen', pre:'Zielgruppen: ', leit:'Wer braucht Unterstützung, wer mehr Anspruch? Woran erkennst du das?', hilfe:['Kinder mit Deutsch als Zweitsprache, Kinder mit Leseschwäche, Kinder, die schnell fertig sind.']},
+          {key:'schraube', label:'Stellschrauben', pre:'Verändere: ', leit:'Sprache, Denkstufe, Hilfen: Was soll sich zwischen den Varianten unterscheiden?', hilfe:['Stützend: kürzere Sätze, Wortschatzhilfe, Beispiel. Fordernd: begründen, beurteilen, übertragen.']},
+          {key:'format', label:'Ausgabe', pre:'Ausgabe: ', leit:'Wie sollen die Varianten ausgegeben werden?', hilfe:['Als Tabelle mit drei Spalten. Das Lernziel bleibt in allen Varianten gleich.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'KI macht es leichter, mehrere Niveaus anzubieten, und spart Vorbereitungszeit. Varianten wirken jedoch schnell passend, ohne zum einzelnen Kind zu passen. Welches Kind welche Variante braucht, bleibt deine Einschätzung.', fragen:['Wo würde dir die KI am meisten Arbeit abnehmen?','Wie stellst du sicher, dass Kinder nicht dauerhaft in einer Variante hängen bleiben?']},
+        {t:'Ethik und Fairness', text:'Differenzieren kann Etiketten verteilen: Wer immer die einfache Variante erhält, erlebt sich als schwach. Zudem können KI-Texte unbemerkt sprachlich schwierig sein.', fragen:['Wie vermeidest du, dass Varianten Kinder in Rollen festschreiben?','Wer entscheidet, welche Variante ein Kind wählt: du oder das Kind?']},
+        {t:'Ähnliche Szenarien', text:'Die Stellschrauben Sprache, Denkstufe und Hilfen lassen sich auch bei Prüfungen, Hausaufgaben, Förderplänen und Lernkontrollen nutzen.', fragen:['Welche Aufgabe in deiner Klasse würdest du als Nächstes differenzieren?','Wo wäre Differenzieren mit KI nicht sinnvoll?']},
+        {t:'Kinder und Lernen', text:'Kinder, die Hilfen immer sofort erhalten, entwickeln weniger eigene Strategien. Gestufte Hilfen (Tipp 1, 2, 3) können das Lernen fördern.', fragen:['Welche Hilfen sollen Kinder erst nach einem eigenen Versuch erhalten?','Woran erkennst du, dass eine Hilfe zur Krücke wird?']}
+      ]},
+
+    umwandeln:{
+      min:'30',
+      eigen:{ titel:'Dein eigenes Material in neuem Format', auftrag:'Wähle ein Material aus deinem Unterricht und überlege selbst, in welche Formate du es verwandeln möchtest. Verwende eigene oder frei verfügbare Texte, keine geschützten Lehrmitteltexte zum Weiterverteilen.',
+        faelle:['Ein Sachtext, den du selbst verfasst hast','Ein Arbeitsblatt, das zum Spiel werden soll','Eine Erklärung, die auch zum Hören taugt'],
+        felder:[
+          {key:'quelle', label:'Ausgangsmaterial', pre:'Ausgangsmaterial: ', leit:'Worum geht es? Den Text selbst fügst du erst im KI-Tool ein.', hilfe:['Ein Sachtext zu [Thema] für [Stufe], ca. [Anzahl] Wörter.']},
+          {key:'format', label:'Zielformate', pre:'Erstelle daraus: ', leit:'Welche zwei bis drei Formate brauchst du wirklich?', hilfe:['Quiz mit 5 Fragen, Lernkarten, Dialog, Lückentext, Elternversion, Mindmap als Liste.']},
+          {key:'zielgruppe', label:'Stufe und Zielgruppe', pre:'Zielgruppe: ', leit:'Für wen sind die neuen Formate?', hilfe:['Kinder einer [Stufe], teilweise mit Deutsch als Zweitsprache.']},
+          {key:'regel', label:'Regeln', pre:'Regeln: ', leit:'Was darf die KI nicht tun?', hilfe:['Verwende nur Informationen aus dem Text. Gib Lösungen separat an.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'Aus einem Text entstehen in Minuten mehrere Formate. Das öffnet Zugänge für Kinder mit unterschiedlichen Stärken. Fehler im Original werden aber vervielfacht, und umgewandelte Inhalte wirken fertiger, als sie sind.', fragen:['Wo hilft dir ein anderes Format wirklich beim Lernen?','Wie prüfst du, dass nichts dazuerfunden wurde?']},
+        {t:'Urheberrecht und Verantwortung', text:'Lehrmittel, Bilder und Texte sind oft geschützt. Aus fremden Texten Quiz oder Arbeitsblätter zu machen und zu verteilen, ist nicht automatisch erlaubt. KI-generierte Inhalte können zudem Teile bestehender Werke enthalten.', fragen:['Welche Texte darfst du an deiner Schule weiterverarbeiten und verteilen?','Wer ist verantwortlich, wenn ein umgewandeltes Material Fehler enthält?']},
+        {t:'Ähnliche Szenarien', text:'Der gleiche Weg führt von Protokollen zu Kurzfassungen, von Sitzungsnotizen zu Aufgabenlisten oder von Elternbriefen zu Chat-Nachrichten.', fragen:['Welches Material verwendest du oft in mehreren Formen?','Was könntest du mit einem Hörtext erreichen, das ein Text nicht kann?']},
+        {t:'Kinder und Lernen', text:'Wenn Kinder selbst Texte zusammenfassen oder Quizfragen erfinden, ist das aktives Lernen. Wenn die KI das übernimmt, entgeht ihnen dieser Lerneffekt.', fragen:['Welche Umwandlungen sollten Kinder selbst vornehmen?','Wie unterscheidest du Material, das du erstellst, von Material, das Kinder erstellen?']}
+      ]},
+
+    feedback:{
+      min:'30',
+      eigen:{ titel:'Dein eigenes Feedback-Setting', auftrag:'Entwirf einen Prompt für ein Feedback zu einem erfundenen Schülerprodukt aus deinem Fach. Keine echten Texte oder Namen von Kindern.',
+        faelle:['Rückmeldung zu einem Schreibprodukt (erfundener Text)','Lernziel in Kindersprache übersetzen','Peer-Feedback anleiten'],
+        felder:[
+          {key:'ziel', label:'Lernziel', pre:'Lernziel: ', leit:'Was soll das Kind können? Formuliere es als «Ich kann …».', hilfe:['Ich beschreibe einen Ort so genau, dass ihn andere sich vorstellen können.']},
+          {key:'produkt', label:'Produkt', pre:'Das Kind hat: ', leit:'Beschreibe in zwei Sätzen, was abgegeben wurde (erfunden, ohne Namen).', hilfe:['… einen Text von vier Sätzen geschrieben. Der Text enthält wenige Adjektive und keine Sinneseindrücke.']},
+          {key:'bausteine', label:'Bausteine', pre:'Das Feedback enthält: ', leit:'Was soll im Feedback stehen?', hilfe:['zwei konkrete Stärken, einen nächsten Schritt mit Beispiel, eine Frage zum Weiterdenken.']},
+          {key:'sprache', label:'Sprache und Länge', pre:'Sprache: ', leit:'Wie soll das Feedback klingen?', hilfe:['Duform, höchstens 60 Wörter, einfache Sprache, wertschätzend.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'KI liefert konkrete, kindgerechte Formulierungen und spart Zeit. Es besteht das Risiko von generischem Lob, das zu keinem Kind passt, und von Feedback, das nicht aus deiner eigenen Beobachtung stammt.', fragen:['Woran merkst du, dass ein Feedback «von der Stange» ist?','Was weisst du über ein Kind, das die KI nicht wissen kann?']},
+        {t:'Datenschutz und Ethik', text:'Feedback bezieht sich auf konkrete Kinder. Darum gilt: keine echten Texte, Namen oder Beobachtungen in ein allgemeines KI-Tool eingeben. Wie arbeitest du trotzdem damit?', fragen:['Wie anonymisierst du einen Kindertext, damit er nicht zurückverfolgbar ist?','Welche Tools sind an deiner Schule für personenbezogene Daten freigegeben?']},
+        {t:'Ähnliche Szenarien', text:'Dieselbe Struktur (Stärke, nächster Schritt, Frage) eignet sich für Rückmeldungen an Eltern, Kolleginnen oder in Gesprächen im Team.', fragen:['Wo gibst du ausserhalb der Klasse Feedback?','Welche Struktur nutzt du selbst am liebsten?']},
+        {t:'Kinder und Lernen', text:'Kinder lernen aus Feedback nur, wenn sie es verstehen und umsetzen können. Beziehung und Vertrauen sind dabei wichtiger als perfekte Formulierungen.', fragen:['Wie stellst du sicher, dass Kinder dein Feedback verstehen?','Was verändert sich, wenn Kinder wissen, dass ein Feedback mit KI-Hilfe formuliert wurde?']}
+      ]},
+
+    beurteilung:{
+      min:'35',
+      eigen:{ titel:'Dein eigenes Raster oder deine Prüfung', auftrag:'Entwirf einen Prompt für ein Beurteilungsraster oder eine Prüfung aus deinem Fach. Hier gilt besonders: keine echten Schülerleistungen oder Zeugnisangaben.',
+        faelle:['Beurteilungsraster zu einer Kompetenz','Prüfung zu einem Thema (mit Lösungen)','Fairness-Check an einem bestehenden Raster'],
+        felder:[
+          {key:'kompetenz', label:'Kompetenz oder Lernziel', leit:'Was wird beurteilt? Für welche Stufe?', hilfe:['Du bist eine erfahrene Lehrperson der [Stufe] in der Deutschschweiz. Entwirf ein Beurteilungsraster für [Kompetenz].']},
+          {key:'kriterien', label:'Kriterien und Stufen', pre:'Kriterien: ', leit:'Wie viele Kriterien und Stufen? Wie sollen sie formuliert sein?', hilfe:['Vier Kriterien, drei Stufen, beobachtbar formuliert: «nennt mindestens …», nicht «zeigt Engagement».']},
+          {key:'punkte', label:'Punkte und Gewichtung', pre:'Punkte: ', leit:'Wie viel zählt was?', hilfe:['Punkte pro Stufe, Gewichtung in Prozent, Vorschlag zur Umrechnung (ich prüfe sie).']},
+          {key:'fair', label:'Fairness', pre:'Fairness: ', leit:'Wen könnte das Raster benachteiligen?', hilfe:['Prüfe, ob Kinder mit Deutsch als Zweitsprache oder Leseschwäche benachteiligt würden, und nenne Alternativen.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'KI kann beim Strukturieren von Kriterien und Aufgaben helfen. Die Formulierungen wirken professionell, ohne zu stimmen. Falsche Punkte, unpassende Aufgaben oder versteckte Schwierigkeiten bleiben leicht unbemerkt.', fragen:['Welche Teile der Beurteilung würdest du KI überlassen, welche nie?','Wie überprüfst du ein KI-Raster, bevor du es einsetzt?']},
+        {t:'Ethik und Fairness', text:'Beurteilung entscheidet über Chancen. KI-generierte Kriterien können unbewusst Gruppen benachteiligen, zum Beispiel durch Sprache, Kultur oder Lesegeschwindigkeit. Wissen Kinder und Eltern, wie beurteilt wird?', fragen:['Welches Kriterium in deinem Raster könnte bestimmte Kinder benachteiligen?','Wie machst du Beurteilung für Kinder und Eltern nachvollziehbar?']},
+        {t:'Ähnliche Szenarien', text:'Kriterienraster helfen auch bei Projektarbeiten, Präsentationen oder Portfolios. Aufgabenentwürfe lassen sich für Lernkontrollen oder Übungen nutzen.', fragen:['Wo würdest du ein Raster gemeinsam mit den Kindern entwickeln?','Welche Aufgabenform prüft wirklich, was du prüfen willst?']},
+        {t:'Verantwortung und Grenzen', text:'Eine Note ist eine Entscheidung mit Folgen für Übertritte und Selbstbild. Diese Entscheidung kannst du nicht delegieren, auch nicht teilweise.', fragen:['Was würdest du Eltern antworten, die fragen, ob KI bei der Beurteilung beteiligt war?','Wo ziehst du für dich die Grenze zwischen Hilfsmittel und Entscheidung?']}
+      ]},
+
+    sparring:{
+      min:'25–30',
+      eigen:{ titel:'Dein eigenes Vorhaben im Sparring', auftrag:'Beschreibe ein Vorhaben aus deinem Alltag (ohne Namen) und schreibe selbst den Prompt, der dich herausfordert.',
+        faelle:['Eine Lektion oder Unterrichtseinheit','Eine neue Klassenregel oder Veränderung','Ein Gespräch, das du vorbereiten möchtest (fiktiv beschrieben)'],
+        felder:[
+          {key:'vorhaben', label:'Vorhaben in drei bis vier Sätzen', pre:'Mein Vorhaben: ', leit:'Was planst du? Für wen, wie lange, mit welchem Ziel?', hilfe:['Ich plane … mit meiner [Klasse]. Das Ziel ist … Der Ablauf ist …']},
+          {key:'rolle', label:'Rolle der KI', leit:'Wer soll dich herausfordern?', hilfe:['Du bist eine kritische, aber wohlwollende Kollegin.','Du bist ein skeptischer Elternteil.']},
+          {key:'aufgabe', label:'Was ich von der KI will', pre:'Aufgabe: ', leit:'Welche Art von Kritik brauchst du?', hilfe:['Stelle mir fünf Fragen, die ich mir nicht gestellt habe. Nenne drei mögliche Schwierigkeiten mit je einer Idee.']},
+          {key:'form', label:'Antwortform', pre:'Ausgabe: ', leit:'Wie soll die Antwort aussehen?', hilfe:['Kurz und priorisiert: nenne die zwei wichtigsten Hinweise zuerst.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'Eine kritische Rückmeldung ist wertvoll, besonders, wenn im Team niemand Zeit hat. Die KI stimmt aber oft zu, formuliert allgemeine Ratschläge und kennt deine Klasse nicht.', fragen:['Wie forderst du echte Kritik statt Zustimmung ein?','Welche Hinweise der KI würdest du nie ungeprüft übernehmen?']},
+        {t:'Beziehung und Vertraulichkeit', text:'Wer sich mit der KI statt mit Kolleginnen austauscht, verliert vielleicht Teamkultur. Zudem gibt man Vorhaben preis, die sensible Informationen enthalten können.', fragen:['Was kann ein Gespräch im Team, was die KI nicht kann?','Welche Informationen aus deiner Klasse würdest du der KI nie beschreiben?']},
+        {t:'Ähnliche Szenarien', text:'Sparring funktioniert auch für Elterngespräche, Konferenzen, Projektanträge oder schwierige Mails, immer als Vorbereitung und nie als Ersatz.', fragen:['Welches Gespräch bereitest du demnächst vor?','Wo hilft dir eine skeptische Rolle am meisten?']},
+        {t:'Kinder und Lernen', text:'Kinder könnten KI als Sparringspartner nutzen: für Ideen, Gegenargumente oder Übungsgespräche. Die Frage ist, wann das hilft und wann es das eigene Denken ersetzt.', fragen:['Wann wäre KI als Sparringspartner für Jugendliche sinnvoll?','Wie würdest du das einführen, ohne dass Kinder zu schnell Antworten übernehmen?']}
+      ]},
+
+    ideen:{
+      min:'25',
+      eigen:{ titel:'Deine eigene Ideensuche', auftrag:'Formuliere selbst einen Prompt für Ideen, die du wirklich brauchen kannst, und gib der KI einen klaren Rahmen.',
+        faelle:['Einstieg in ein neues Thema','Lernspiel oder Bewegungsaufgabe','Fächerübergreifendes Projekt'],
+        felder:[
+          {key:'thema', label:'Thema und Stufe', leit:'Wofür suchst du Ideen? Für welche Stufe?', hilfe:['Ich unterrichte eine [Stufe] in der Deutschschweiz. Thema: [Thema].']},
+          {key:'rahmen', label:'Rahmen', pre:'Rahmen: ', leit:'Zeit, Material, Gruppengrösse, Raum.', hilfe:['höchstens 10 Minuten, wenig Material, 20 Kinder, drinnen oder auf dem Pausenplatz.']},
+          {key:'anzahl', label:'Anzahl und Form', pre:'Gib mir: ', leit:'Wie viele Ideen, in welcher Form?', hilfe:['10 Ideen mit Titel und einem Satz.']},
+          {key:'auswahl', label:'Auswahlhilfe', pre:'Zusätzlich: ', leit:'Wie sollen dir die Ideen beim Auswählen helfen?', hilfe:['Markiere die drei Ideen, die mit dem wenigsten Material auskommen.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'Viele Ideen in kurzer Zeit entlasten und inspirieren. Ideen, die alle KI-Nutzenden erhalten, sehen sich aber ähnlich. Originalität und der Bezug zu deiner Klasse müssen von dir kommen.', fragen:['Welche Idee der KI hätte sicher auch ein anderes Team bekommen?','Was macht deine Klasse einzigartig, und wie bringst du das in den Prompt?']},
+        {t:'Sachliche Richtigkeit und Sicherheit', text:'Ideen enthalten oft Behauptungen zu Tieren, Geschichte oder Gesundheit. Bei Spielen und Experimenten kommen Sicherheitsfragen hinzu.', fragen:['Welche Ideen brauchen eine Sicherheitsprüfung, bevor du sie einsetzt?','Wie prüfst du Sachaussagen in einer Geschichte der KI?']},
+        {t:'Ähnliche Szenarien', text:'Ideenfindung hilft auch bei Schulfesten, Elternabenden, Wochenplänen, Projekten oder Teamanlässen.', fragen:['Für welchen Anlass an deiner Schule suchst du Ideen?','Wo wäre der Austausch im Team wertvoller als eine Liste von der KI?']},
+        {t:'Kinder und Lernen', text:'Kreativität entsteht oft, wenn Kinder selbst auf Ideen kommen müssen. Wenn die KI sofort Vorschläge liefert, kann das Denken verkürzt werden.', fragen:['Wann sollen Kinder zuerst selbst Ideen sammeln, bevor sie eine KI fragen?','Wie würdest du KI-Ideen und eigene Ideen gemeinsam nutzen?']}
+      ]},
+
+    vorbereitung:{
+      min:'35',
+      eigen:{ titel:'Deine eigene Unterrichtseinheit', auftrag:'Plane mit einem eigenen Prompt eine Einheit, die du in den nächsten Wochen wirklich brauchst. Prüfe den Lehrplanbezug im offiziellen Lehrplan.',
+        faelle:['Eine Einheit für den nächsten Monat','Ein Thema, für das es kein gutes Lehrmittel gibt','Ein Arbeitsblatt zu einer bestehenden Lektion'],
+        felder:[
+          {key:'thema', label:'Fach, Stufe, Thema', leit:'Wofür planst du?', hilfe:['Du bist eine erfahrene Lehrperson einer [Stufe] in der Deutschschweiz. Plane eine Einheit zu [Thema] im Fach [Fach].']},
+          {key:'ziele', label:'Lernziele und Lehrplan', pre:'Lernziele: ', leit:'Was sollen die Kinder können? Welche Kompetenz im Lehrplan?', hilfe:['Formuliere vier Lernziele. Schlage passende Kompetenzbereiche des Lehrplans vor, ich prüfe sie nach.']},
+          {key:'umfang', label:'Umfang', pre:'Umfang: ', leit:'Wie viele Lektionen, wie lang?', hilfe:['drei Lektionen à 45 Minuten, als Tabelle: Zeit, Aktivität, Material, Sozialform.']},
+          {key:'material', label:'Material', pre:'Material: ', leit:'Welches Material brauchst du?', hilfe:['Ein Arbeitsblatt mit drei Aufgaben und Lösungen für Lektion 2.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'Struktur, Entwürfe und Arbeitsblätter entstehen schnell. Pläne wirken überzeugend und sind trotzdem zu dicht, fachlich ungenau oder passen nicht zum Lehrplan.', fragen:['Wo spart dir KI wirklich Zeit, und wo kostet das Prüfen mehr, als es bringt?','Wie prüfst du Lehrplanbezug und Sachrichtigkeit effizient?']},
+        {t:'Professionalität', text:'Unterrichtsvorbereitung ist auch Denkarbeit: Was ist wichtig, was lasse ich weg? Wenn die KI diese Entscheidungen vorschlägt, verändert sich dein didaktischer Blick.', fragen:['Welche didaktischen Entscheidungen willst du bewusst selbst treffen?','Wie bleibst du in der Planung als Fachperson sichtbar?']},
+        {t:'Ähnliche Szenarien', text:'Dieselben Schritte lassen sich für Jahresplanung, Projektwochen, Elterninformationen oder Förderplanungen verwenden.', fragen:['Welche Planung wiederholt sich bei dir jedes Jahr?','Was würdest du als Vorlage im Team teilen?']},
+        {t:'Teamarbeit und Material', text:'Wer KI-Material teilt, sollte kennzeichnen, wie es entstand und geprüft wurde. Sonst verbreiten sich Fehler im Team.', fragen:['Wie kennzeichnest du KI-Material im Team?','Wer prüft Material, bevor es breit eingesetzt wird?']}
+      ]},
+
+    halluzinationen:{
+      min:'30',
+      eigen:{ titel:'Deine eigene Prüfung', auftrag:'Stelle der KI eine Frage zu einem Thema, bei dem du dich selbst gut auskennst, und prüfe die Antwort. Du bist die Expertin oder der Experte.',
+        faelle:['Ein Thema aus deinem Fachgebiet','Eine Aussage über deine Gemeinde oder Region','Eine Zahl oder Jahreszahl, die du nachprüfen kannst'],
+        felder:[
+          {key:'frage', label:'Meine Frage', leit:'Was willst du wissen? Wähle etwas, das du prüfen kannst.', hilfe:['Erkläre mir [Thema] in fünf Sätzen für [Stufe].']},
+          {key:'quellen', label:'Quellenanforderung', pre:'Quellen: ', leit:'Was soll die KI zu Quellen angeben?', hilfe:['Nenne für jede Aussage eine Quelle mit Titel, Herausgeber und Jahr.']},
+          {key:'einordnung', label:'Einordnung', pre:'Einordnung: ', leit:'Wie soll die KI ihre Sicherheit einordnen?', hilfe:['Bewerte jede Aussage mit sicher / unsicher / nicht belegbar.']},
+          {key:'plan', label:'Mein Prüfplan (nur für dich)', intern:true, leit:'Welche zwei Aussagen prüfst du wo nach?', hilfe:['Seriöse Quellen: Bundesämter, Museen, Hochschulen, Fachverbände, bewährte Lehrmittel.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'KI ist hilfreich zum Verstehen, Strukturieren und Formulieren, aber nicht zuverlässig als Quelle. Fehler werden mit grosser Selbstsicherheit vorgetragen und von Kindern oder Eltern geglaubt.', fragen:['Welche Aufgaben würdest du der KI zutrauen, welche nicht?','Wann reicht ein Faktencheck, wann braucht es zwei Quellen?']},
+        {t:'Ethik und Verantwortung', text:'Wer Informationen weitergibt, trägt Verantwortung für ihre Richtigkeit. Das gilt auch, wenn die Information aus einer KI stammt. Wie wirkt es auf Kinder, wenn Fehler nicht korrigiert werden?', fragen:['Wie gehst du mit einem Fehler um, den du später bemerkst?','Wie machst du transparent, dass Informationen geprüft wurden?']},
+        {t:'Ähnliche Szenarien', text:'Dieselbe Prüfroutine gilt für Zeitungsartikel, soziale Medien, Videos, Bilder und Aussagen von Personen. Was für KI gilt, gilt für alle Quellen.', fragen:['Wo begegnen dir im Schulalltag Informationen, die du prüfen müsstest?','Welche Quelle hältst du für vertrauenswürdig und warum?']},
+        {t:'Kinder und Lernen', text:'Kinder müssen lernen, Informationen nicht nur zu finden, sondern zu bewerten. Je jünger sie sind, desto einfacher müssen die Prüfregeln sein.', fragen:['Welche zwei Prüffragen können schon Kinder in Zyklus 1 oder 2 lernen?','Wie kannst du ihnen zeigen, dass auch Erwachsene prüfen?']}
+      ]},
+
+    schueler:{
+      min:'35',
+      eigen:{ titel:'Dein eigener Klassen-Baustein', auftrag:'Entwirf mit einem eigenen Prompt einen Baustein für deine Klasse, zum Beispiel Regeln, eine Erklärung oder eine Info an Eltern. Du entscheidest, was zu deiner Stufe passt.',
+        faelle:['Klassenregeln zum Umgang mit KI','Eine kurze Erklärung, was KI ist','Eine Information an Eltern'],
+        felder:[
+          {key:'stufe', label:'Stufe und Situation', leit:'Für wen und wofür?', hilfe:['Ich unterrichte eine [Stufe]. Die Kinder kennen KI aus [Alltag / eigener Nutzung].']},
+          {key:'grund', label:'Grundsätze', pre:'Berücksichtige: ', leit:'Was soll inhaltlich enthalten sein?', hilfe:['Daten schützen, Quellen prüfen, selbst denken, ehrlich sagen, wenn KI geholfen hat, Verantwortung übernehmen.']},
+          {key:'form', label:'Form', pre:'Gib mir: ', leit:'Welche Form brauchst du?', hilfe:['fünf Regeln in Kindersprache, eine KI-Ampel mit je drei Beispielen, eine Deklarationsvorlage.']},
+          {key:'sprache', label:'Sprache', pre:'Sprache: ', leit:'Wie soll es klingen?', hilfe:['kurz, positiv formuliert («Wir …»), für Kinder der [Stufe] verständlich.']}
+        ]},
+      denken:[
+        {t:'Chancen und Risiken', text:'KI kann Lernen individualisieren und Kindern Erklärungen bieten. Sie kann aber auch Denkarbeit abnehmen, Abhängigkeit fördern und Kindern Unwahres als gesichert präsentieren.', fragen:['Wann wäre KI für ein Kind in deiner Klasse eine Hilfe, wann eine Abkürzung?','Wie erkennst du, dass ein Kind die Arbeit selbst verstanden hat?']},
+        {t:'Ethik, Datenschutz und Gerechtigkeit', text:'Nicht alle Kinder haben zu Hause Zugang zu KI-Tools oder Begleitung. Zudem gelten Altersgrenzen, Einverständnis und Datenschutz. Gerechtigkeit heisst auch, dass nicht nur privilegierte Kinder profitieren.', fragen:['Wie stellst du Chancengerechtigkeit sicher, wenn nur einige Kinder KI zu Hause nutzen?','Was müssen Eltern über Altersvorgaben und Datenschutz wissen?']},
+        {t:'Ähnliche Szenarien', text:'Die gleichen Fragen stellten sich schon bei Taschenrechnern, Übersetzungsprogrammen oder dem Internet. Was hat die Schule damals entschieden, und was lässt sich übertragen?', fragen:['Welche früheren Technologien haben das Lernen verändert, und wie ist die Schule damit umgegangen?','Was ist diesmal anders?']},
+        {t:'Haltung und Vorbild', text:'Kinder beobachten, wie Erwachsene mit KI umgehen. Wie du sie nutzt, kennzeichnest und begrenzt, wirkt stärker als jede Regel.', fragen:['Wie machst du deine eigene KI-Nutzung gegenüber Kindern sichtbar?','Welche Haltung möchtest du ihnen vermitteln?']}
+      ]}
+  };
+  S.forEach(function(s){
+    var x = EXTRA[s.id];
+    if (!x) return;
+    s.eigen = x.eigen; s.denken = x.denken; s.min = x.min;
+    if (x.vorlage) s.vorlage = x.vorlage;
+  });
+
+  var META = {
+    1:{label:'Zyklus 1', sub:'Kindergarten bis 2. Klasse'},
+    2:{label:'Zyklus 2', sub:'3. bis 6. Klasse'},
+    3:{label:'Zyklus 3', sub:'7. bis 9. Klasse'}
+  };
+  S.forEach(function(s){
+    if (!s.stufen) return;
+    [1,2,3].forEach(function(n){
+      var z = s.stufen[n];
+      z.label = z.label || META[n].label;
+      z.sub = z.sub || META[n].sub;
+    });
+  });
+
+  /* Kurzfassung je Station für den Spickzettel */
+  var KERN = {
+    prompting:'Rolle – Auftrag – Kontext – Kriterien – Ausgabeformat. Der erste Entwurf ist nie das Ergebnis: nachfragen, verfeinern, Rückfragen zulassen.',
+    eltern:'Aus Stichworten einen Entwurf schreiben lassen, in Leichte Sprache vereinfachen, übersetzen lassen und prüfen. Zahlen, Daten und Ton immer selbst kontrollieren.',
+    differenzieren:'Dasselbe Lernziel auf drei Niveaus: stützen (Hilfen, Wortschatz), Standard, fordern (offener, begründen). Das Niveau im Prompt ausdrücklich nennen.',
+    umwandeln:'Gleicher Inhalt, anderes Format: Quiz, Lernkarten, Dialog/Hörtext, Elternversion. «Verwende nur Informationen aus dem Text» und das Ergebnis prüfen.',
+    feedback:'Konkrete Stärken, ein nächster Schritt, eine Frage zum Weiterdenken – in Kindersprache. KI liefert den Entwurf, die Einschätzung bleibt bei mir.',
+    beurteilung:'KI für Entwürfe (Kriterienraster, Aufgaben), nicht für die Bewertung. Kriterien auf Beobachtbarkeit und Fairness prüfen. Keine echten Schülerdaten.',
+    sparring:'KI als kritische Kollegin: Was übersehe ich? Was könnte schiefgehen? Welche Fragen stellen Eltern? Ich entscheide, was ich übernehme.',
+    ideen:'Viele Ideen anfordern, Rahmen vorgeben (Zeit, Material, Gruppe), eine auswählen und im Dialog weiterentwickeln.',
+    vorbereitung:'Schrittweise vorgehen: Themenübersicht → Lernziele → Ablauf → Aufgaben. Lehrplanbezug und Sachinformationen immer selbst prüfen.',
+    halluzinationen:'KI klingt sicher, auch wenn sie irrt. Je wichtiger und überprüfbarer die Aussage, desto sicherer kontrollieren: Zahlen, Zitate, Quellen.',
+    schueler:'Wann hilft KI beim Lernen, wann nimmt sie es ab? Sechs Grundsätze: Ressourcen schonen, Daten schützen, Quellen prüfen, selbst denken, transparent sein, Verantwortung übernehmen.'
+  };
+  function spickPrompt(s){
+    var z = s.stufen ? s.stufen[getStufe()] : null;
+    if (z && z.bau) return assemble(z.bau);
+    return s.vorlage || '';
+  }
+  function plain(t){ return t.replace(/&shy;/g,''); }
+
+  /* ===== Startseite ===== */
+  var filter = 0;
+
+  function lvlBadge(n){ return '<span class="lvl" title="'+LVN[n]+'">'+LV[n]+'</span>'; }
+
+  function renderHome(){
+    theme('#c7d200');
+    var g = $('grid'); g.innerHTML='';
+    S.forEach(function(s,i){
+      if (filter && s.level!==filter) return;
+      var a = document.createElement('a');
+      a.className = 'tile'+(DONE[s.id]?' is-done':'');
+      a.href = '#'+s.id;
+      a.style.background = s.bg;
+      a.innerHTML =
+        '<span class="no">STATION '+(i<9?'0':'')+(i+1)+'</span>'+
+        '<span class="tick" aria-hidden="true">'+(DONE[s.id]?'✓':'')+'</span>'+
+        '<span class="t">'+s.title+'</span>'+
+        '<span class="s">'+esc(s.sub)+'</span>'+
+        '<span class="meta">'+lvlBadge(s.level)+'<span>ca. '+s.min+' Min.</span></span>';
+      g.appendChild(a);
+    });
+    var n = S.filter(function(s){ return DONE[s.id]; }).length;
+    $('progress').textContent = n+' von '+S.length+' erledigt';
+  }
+
+  /* ===== Station ===== */
+  var STEPS = ['Verstehen','Ausprobieren','Transfer','Verfeinern','Weiterdenken','Take-Home'];
+  var step = 0, curId = null;
+
+  function noteKey(id){ return 'note_'+id; }
+  function transferKey(id){ return 'tr_'+id; }
+  function list(items, cls){
+    return '<ul'+(cls?' class="'+cls+'"':'')+'>'+items.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ul>';
+  }
+  function getStufe(){
+    var v = parseInt(store.get('stufe'),10);
+    return (v>=1 && v<=3) ? v : 2;
+  }
+  function assemble(b){
+    return b.rolle+'\n'+b.auftrag+'\nKontext: '+b.kontext+'\nKriterien: '+b.kriterien+'\nAusgabeformat: '+b.format;
+  }
+  function promptBox(label, text, id){
+    return '<div class="prompt"><span class="lab">'+esc(label)+'</span><span class="ptxt"'+(id?' id="'+id+'"':'')+'>'+esc(text)+'</span><button class="copy" type="button">Kopieren</button></div>';
+  }
+  function sub(t){ return '<h3 class="sub">'+t+'</h3>'; }
+
+  /* ----- Panel 1: Verstehen ----- */
+  function panelVerstehen(s, z){
+    var h = '<p class="lede">'+esc(s.hinfuehrung)+'</p>';
+    var cards = s.schema || s.karten;
+    if (cards){
+      h += sub(esc(s.kartenTitel || 'Das Grundschema'))+'<div class="schema">'+cards.map(function(c,i){
+        var ex = (s.schema && z && z.bau) ? z.bau[c.key] : '';
+        return '<div class="card"><span class="no">0'+(i+1)+'</span><div class="ck">'+esc(c.k)+'</div><div class="cq">'+esc(c.q||'')+'</div>'+
+          (ex?'<div class="ce">'+esc(ex)+'</div>':'')+'</div>';
+      }).join('')+'</div>';
+      if (s.schema && z) h += '<p class="hint">Die Beispiele in den Karten gehören zum gewählten Szenario: <b>'+esc(z.thema)+'</b> ('+esc(z.label)+').</p>';
+    }
+    h += sub('Kurz erklärt')+list(s.erklaert);
+    if (s.stolper) h += sub('Typische Stolpersteine')+list(s.stolper);
+    return h;
+  }
+
+  /* ----- Panel 2: Ausprobieren ----- */
+  function baukasten(s, z){
+    var labels = {rolle:'Rolle', auftrag:'Auftrag', kontext:'Kontext', kriterien:'Kriterien', format:'Ausgabeformat'};
+    var h = '<div class="bau">';
+    ['rolle','auftrag','kontext','kriterien','format'].forEach(function(k,i){
+      h += '<label class="bf"><span class="bl"><span class="bn">'+(i+1)+'</span>'+labels[k]+'</span>'+
+        '<textarea rows="2" data-k="'+k+'">'+esc(z.bau[k])+'</textarea></label>';
+    });
+    h += '</div>'+
+      '<p><button class="btn ghost small" type="button" id="bauReset">Felder zurücksetzen</button></p>'+
+      promptBox('Dein Prompt', assemble(z.bau), 'bauOut');
+    return h;
+  }
+  function panelAusprobieren(s, z){
+    var h = '<div class="szen"><div class="k">Dein Auftrag · '+esc(z.label)+'</div><p><b>'+esc(z.thema)+'</b></p><p>'+esc(z.szenario)+'</p>'+
+      '<p class="small">'+(z.bau ? 'Lieber ein eigenes Thema? Überschreibe in Schritt 2 einfach die Felder.' : 'Lieber ein eigenes Thema? Ersetze die Angaben in den Prompts durch deine eigenen.')+'</p></div>';
+    h += '<ol class="flow">';
+    if (z.bau){
+      h += '<li><b>Knapp starten.</b> Kopiere diesen kurzen Prompt in dein KI-Tool und lies das Ergebnis. Was fehlt dir?'+promptBox('Knapper Prompt', z.bad)+'</li>';
+      h += '<li><b>Mit dem Baukasten verbessern.</b> Passe die fünf Felder an. Unten entsteht dein Prompt. Kopiere ihn in dein KI-Tool.'+baukasten(s, z)+'</li>';
+    } else {
+      z.steps.forEach(function(st){
+        h += '<li><b>'+st.h+'</b> '+(st.d||'')+(st.t ? promptBox(st.lab||'Prompt', st.t) : '')+'</li>';
+      });
+    }
+    h += '<li><b>'+(z.bau ? 'Vergleichen.' : 'Ergebnis prüfen.')+'</b> '+(z.bau ? 'Worin unterscheiden sich die beiden Ergebnisse? ' : 'Vergleiche dein Ergebnis mit dem Beispiel und achte auf die Prüffragen. ')+'Danach kannst du sehen, wie ein Ergebnis aussehen könnte.'+
+      '<details><summary>'+esc(z.exTitle || 'Beispiel für ein mögliches Ergebnis')+'</summary><div class="ex">'+esc(z.beispiel)+'</div><p class="small">'+esc(z.exNote || 'Dein Ergebnis wird anders aussehen. Das ist normal: KI antwortet jedes Mal etwas anders.')+'</p></details>'+
+      '<p class="k2">Worauf du achten kannst</p>'+list(z.pruef)+'</li>';
+    h += '</ol>';
+    return h;
+  }
+
+  /* ----- gespeicherte Eigenleistungen ----- */
+  function eigenGet(id){
+    try{ return JSON.parse(store.get('eigen_'+id) || '{}') || {}; }catch(e){ return {}; }
+  }
+  function assembleEigen(s, vals){
+    return s.eigen.felder.filter(function(f){ return !f.intern; }).map(function(f){
+      var v = (vals[f.key]||'').trim();
+      return v ? (f.pre||'')+v : '';
+    }).filter(Boolean).join('\n');
+  }
+  function mineGet(id){
+    return {
+      fall: (store.get('fall_'+id)||'').trim(),
+      prompt: (store.get('myprompt_'+id)||'').trim(),
+      best: (store.get('best_'+id)||'').trim(),
+      gedanke: (store.get('gedanke_'+id)||'').trim(),
+      note: (store.get('tr_'+id)||'').trim()
+    };
+  }
+
+  /* ----- Panel 3: Transfer («Eigener Fall») ----- */
+  function panelTransfer(s){
+    var e = s.eigen, vals = eigenGet(s.id);
+    var h = '<div class="szen"><div class="k">Jetzt bist du dran</div><p><b>'+esc(e.titel)+'</b></p><p>'+esc(e.auftrag)+'</p>'+
+      '<p class="small"><b>Datenschutz:</b> Verwende erfundene Namen und Platzhalter wie [Name]. Keine echten Angaben zu Kindern, Eltern oder Kolleginnen.</p></div>';
+    h += '<ol class="flow">';
+
+    h += '<li><b>Fall wählen.</b> Welcher Fall aus deinem Alltag der nächsten Wochen passt? Zum Beispiel:'+list(e.faelle)+
+      '<label class="bf"><span class="bl">Mein Fall in einem Satz</span><textarea rows="2" id="fallIn" data-local="1"></textarea></label></li>';
+
+    h += '<li><b>Prompt selbst schreiben.</b> Fülle die Felder in eigenen Worten aus. Die Formulierungshilfen öffnest du erst, wenn du nicht weiterkommst.<div class="bau">'+
+      e.felder.map(function(f,i){
+        return '<div class="bf"><label><span class="bl"><span class="bn">'+(i+1)+'</span>'+esc(f.label)+'</span>'+
+          '<textarea rows="2" data-ek="'+f.key+'" placeholder="'+esc(f.leit).replace(/"/g,'&quot;')+'"></textarea></label>'+
+          '<details class="mini"><summary>Formulierungshilfe</summary><div class="hilfe">'+list(f.hilfe.map(esc))+'</div></details></div>';
+      }).join('')+'</div>'+
+      '<p class="small">Dein Prompt entsteht unten automatisch aus deinen Feldern.</p>'+
+      '<div class="prompt" data-empty="1" id="myBox"><span class="lab">Mein Prompt</span><span class="ptxt" id="myOut">(Noch leer: Fülle oben die Felder aus.)</span><button class="copy" type="button">Kopieren</button></div></li>';
+
+    h += '<li><b>Selbst prüfen.</b> Bevor du den Prompt abschickst, prüfe kritisch, ob …<ul class="check">'+
+      e.felder.filter(function(f){ return !f.intern; }).map(function(f){
+        return '<li><label><input type="checkbox"><span>«'+esc(f.label)+'» konkret und in deinen Worten angegeben ist.</span></label></li>';
+      }).join('')+
+      '<li><label><input type="checkbox"><span>keine echten Namen oder Angaben zu Personen enthalten sind.</span></label></li>'+
+      '<li><label><input type="checkbox"><span>die KI nichts raten muss, was du eigentlich weisst.</span></label></li></ul></li>';
+
+    h += '<li><b>Abschicken.</b> Kopiere deinen Prompt in dein KI-Tool und lies das Ergebnis. Es ist im nächsten Schritt die Grundlage fürs Verfeinern.</li>';
+
+    h += '<li><b>Partner-Check (3 Minuten).</b> Tauscht eure Prompts. Beantwortet gegenseitig:'+
+      list(['Was ist an diesem Prompt klar?','Was müsste die KI raten?','Welche eine Änderung würde das Ergebnis am meisten verbessern?'])+
+      '<details><summary>Mustervorlage zum Vergleich (erst nach deinem Versuch)</summary>'+promptBox('Vorlage', s.vorlage)+'</details></li>';
+
+    h += '</ol>';
+    return h;
+  }
+
+  /* ----- Panel 4: Verfeinern ----- */
+  function panelVerfeinern(s, z){
+    var n = s.weiterKarten.length;
+    var num = {3:'Drei',4:'Vier',5:'Fünf',6:'Sechs'}[n] || n;
+    var h = '<p class="lede">Arbeite jetzt an deinem eigenen Ergebnis aus «Transfer» weiter. '+num+' Bausteine helfen dir. Wähle zwei aus und passe sie an dein Ergebnis an: Ersetze die Klammern mit deinen Inhalten.</p>'+
+      '<div class="wk">'+s.weiterKarten.map(function(c,i){
+        return '<details class="wcard"><summary><span class="no">'+(i+1)+'</span>'+esc(c.t)+'</summary>'+
+          '<p>'+esc(c.e)+'</p>'+(c.p.charAt(0)==='(' ? '<p class="small">'+esc(c.p)+'</p>' : promptBox('Vorlage', c.p))+'</details>';
+      }).join('')+'</div>';
+    if (z && z.nachfragen){
+      h += '<details style="margin-top:1.6rem"><summary>Beispiel-Nachfragen aus dem Szenario «'+esc(z.thema)+'»</summary>'+
+        z.nachfragen.map(function(q){ return promptBox('Nachfrage', q); }).join('')+'</details>';
+    }
+    h += sub('Meine wirksamste Nachfrage')+
+      '<p>Welche Nachfrage hat dein Ergebnis am meisten verbessert? Schreibe sie in deinen Worten auf. Sie kommt in dein Take-Home.</p>'+
+      '<p style="margin-top:.8rem"><textarea class="notes" id="bestIn" data-local="1" placeholder="Zum Beispiel: «Schreibe es kürzer und mit einem Beispiel aus dem Alltag.»"></textarea></p>';
+    return h;
+  }
+
+  /* ----- Panel 5: Weiterdenken ----- */
+  function panelDenken(s){
+    return '<p class="lede">Nicht jede Frage hat eine Antwort. Wähle einen Denkanstoss, besprecht ihn zu zweit (ca. 5 Minuten) und halte einen eigenen Gedanken fest.</p>'+
+      '<div class="denk">'+s.denken.map(function(c,i){
+        return '<div class="card"><span class="no">0'+(i+1)+'</span><div class="ck">'+esc(c.t)+'</div><p class="dt">'+esc(c.text)+'</p>'+list(c.fragen.map(esc))+'</div>';
+      }).join('')+'</div>'+
+      sub('Mein Gedanke')+
+      '<p>Welcher Gedanke bleibt dir? Schreibe ihn auf, auch wenn er noch nicht fertig ist. Er kommt in dein Take-Home.</p>'+
+      '<p style="margin-top:.8rem"><textarea class="notes" id="gedankeIn" data-local="1" placeholder="Mein Gedanke …"></textarea></p>';
+  }
+
+  /* ----- Panel 6: Take-Home ----- */
+  function panelTakeHome(s, next){
+    return '<p class="lede">Das hast du in dieser Station gesammelt:</p>'+
+      '<div class="transfer-item" id="thSummary"></div>'+
+      '<p class="lede" style="margin-top:2rem">Aus dieser Station nehme ich Folgendes mit:</p>'+
+      '<p style="margin-top:1rem"><textarea class="notes" id="note" placeholder="'+esc(s.transfer).replace(/"/g,'&quot;')+'" aria-label="Das nehme ich aus dieser Station mit"></textarea></p>'+
+      '<p class="hint">Alles bleibt nur in diesem Browser. Unter «Mein Take-Home» kannst du alles speichern oder kopieren.</p>'+
+      sub('Kurz-Check')+'<p>Bevor du weitergehst: Prüfe kritisch, ob …</p>'+list(s.check.map(esc))+
+      '<div class="footnav">'+
+        '<button class="btn'+(DONE[s.id]?' done':'')+'" id="btnDone" type="button">'+(DONE[s.id]?'✓ Erledigt':'Als erledigt markieren')+'</button>'+
+        '<span class="sp"></span>'+
+        '<a class="btn ghost" href="#">Zur Übersicht</a>'+
+        (next?'<a class="btn ghost" href="#'+next.id+'">Nächste Station →</a>':'<a class="btn" href="#takehome">Mein Take-Home →</a>')+
+      '</div>';
+  }
+  function summaryHtml(id){
+    var m = mineGet(id), out = '';
+    function row(k, v, pre){ if (v) out += '<div class="srow"><div class="k">'+k+'</div><p'+(pre?' class="pre"':'')+'>'+esc(v)+'</p></div>'; }
+    row('Mein Fall', m.fall);
+    row('Mein Prompt', m.prompt, true);
+    row('Meine wirksamste Nachfrage', m.best);
+    row('Mein Gedanke zum Weiterdenken', m.gedanke);
+    return out || '<p class="small">Noch nichts gesammelt. Fülle die Schritte «Transfer», «Verfeinern» und «Weiterdenken» aus, dann erscheint es hier.</p>';
+  }
+
+  /* ----- Station aufbauen ----- */
+  function renderStation(id, keep){
+    var idx = S.findIndex(function(s){ return s.id===id; });
+    var s = S[idx];
+    if (!keep || curId!==id) step = 0;
+    curId = id;
+    theme(s.bg);
+    var prev = S[idx-1], next = S[idx+1];
+    var sv = s.stufen ? getStufe() : 0;
+    var z = s.stufen ? s.stufen[sv] : null;
+    var nm = function(x){ return esc(plain(x.title)); };
+
+    var panels = [panelVerstehen(s,z), panelAusprobieren(s,z), panelTransfer(s), panelVerfeinern(s,z), panelDenken(s), panelTakeHome(s,next)];
+
+    var html =
+      '<div class="nav"><a class="btn ghost small" href="#">← Übersicht</a><span class="sp"></span>'+
+        (prev?'<a class="btn ghost small" href="#'+prev.id+'">← '+nm(prev)+'</a>':'')+
+        (next?'<a class="btn ghost small" href="#'+next.id+'">'+nm(next)+' →</a>':'')+
+      '</div>'+
+      '<div class="kicker">Station '+(idx<9?'0':'')+(idx+1)+' von '+S.length+'</div>'+
+      '<h1 class="title" id="sTitle">'+s.title+'</h1>'+
+      '<p class="lead" id="sLead">'+esc(s.sub)+'</p>'+
+      '<div class="steck" id="sSteck">'+
+        '<div><div class="k">Level</div><div class="v">'+LV[s.level]+' '+LVN[s.level]+'</div></div>'+
+        '<div><div class="k">Dauer</div><div class="v">ca. '+s.min+' Min.</div></div>'+
+        '<div><div class="k">Du brauchst</div><div class="v">'+esc(s.brauchst)+'</div></div>'+
+        '<div class="wide"><div class="k">Das nimmst du mit</div><div class="v">'+esc(s.mitnehmen)+'</div></div>'+
+        '<div class="wide"><div class="k">Datenschutz</div><div class="v">Nur fiktive Daten verwenden. Keine echten Namen oder Beobachtungen zu Kindern.</div></div>'+
+      '</div>'+
+      (s.stufen ?
+        '<div class="stufen" role="group" aria-label="Stufe wählen"><span class="lbl">Für welche Stufe?</span>'+
+        [1,2,3].map(function(n){
+          var o = s.stufen[n];
+          return '<button class="chip stufe" type="button" data-z="'+n+'" aria-pressed="'+(n===sv?'true':'false')+'">'+esc(o.label)+'<small>'+esc(o.sub)+'</small></button>';
+        }).join('')+'</div>' : '')+
+      '<div class="steps" id="stepnav" role="tablist">'+
+        STEPS.map(function(t,i){
+          return '<button class="stepbtn" type="button" role="tab" data-s="'+i+'"><span class="sn">'+(i+1)+'</span>'+t+'</button>';
+        }).join('')+
+      '</div>'+
+      panels.map(function(p,i){
+        var nav = '<div class="pnav">'+
+          (i>0?'<button class="btn ghost" type="button" data-go="'+(i-1)+'">← '+STEPS[i-1]+'</button>':'<span></span>')+
+          (i<STEPS.length-1?'<button class="btn" type="button" data-go="'+(i+1)+'">'+STEPS[i+1]+' →</button>':'')+
+        '</div>';
+        return '<section class="sec panel" data-p="'+i+'" role="tabpanel"><h2><span class="n">0'+(i+1)+'</span>'+STEPS[i]+'</h2>'+p+nav+'</section>';
+      }).join('');
+    $('station').innerHTML = html;
+
+    var root_ = $('station');
+    function autoGrow(t){ t.style.height='auto'; t.style.height=(t.scrollHeight+4)+'px'; }
+    function autoGrowAll(){ Array.prototype.forEach.call(root_.querySelectorAll('.bau textarea'), autoGrow); }
+    function refreshSummary(){ $('thSummary').innerHTML = summaryHtml(s.id); }
+
+    /* Schritte */
+    function showStep(i, scroll){
+      step = i;
+      Array.prototype.forEach.call(root_.querySelectorAll('.panel'), function(p){ p.hidden = parseInt(p.getAttribute('data-p'),10)!==i; });
+      Array.prototype.forEach.call(root_.querySelectorAll('.stepbtn'), function(b){
+        var on = parseInt(b.getAttribute('data-s'),10)===i;
+        b.setAttribute('aria-selected', on?'true':'false');
+      });
+      var compact = i>0;
+      $('sTitle').classList.toggle('compact', compact);
+      $('sLead').hidden = compact;
+      $('sSteck').hidden = compact;
+      fitTitles();
+      autoGrowAll();
+      if (i === STEPS.length-1) refreshSummary();
+      if (scroll) window.scrollTo({top:0});
+    }
+    Array.prototype.forEach.call(root_.querySelectorAll('[data-s]'), function(b){
+      b.addEventListener('click', function(){ showStep(parseInt(b.getAttribute('data-s'),10), true); });
+    });
+    Array.prototype.forEach.call(root_.querySelectorAll('[data-go]'), function(b){
+      b.addEventListener('click', function(){ showStep(parseInt(b.getAttribute('data-go'),10), true); });
+    });
+    showStep(step, false);
+
+    /* Stufe */
+    Array.prototype.forEach.call(root_.querySelectorAll('.stufe'), function(b){
+      b.addEventListener('click', function(){
+        store.set('stufe', b.getAttribute('data-z'));
+        renderStation(id, true);
+      });
+    });
+
+    /* Baukasten */
+    if (z && z.bau){
+      var cur = {};
+      function grow(t){ t.style.height='auto'; t.style.height=(t.scrollHeight+4)+'px'; }
+      function growAll(){ Array.prototype.forEach.call(root_.querySelectorAll('.bau textarea'), grow); }
+      Array.prototype.forEach.call(root_.querySelectorAll('[data-s],[data-go]'), function(b){ b.addEventListener('click', function(){ setTimeout(growAll,0); }); });
+      Object.keys(z.bau).forEach(function(k){ cur[k] = z.bau[k]; });
+      Array.prototype.forEach.call(root_.querySelectorAll('.bau textarea'), function(t){
+        t.addEventListener('input', function(){
+          cur[t.getAttribute('data-k')] = t.value;
+          grow(t);
+          $('bauOut').textContent = assemble(cur);
+        });
+      });
+      $('bauReset').addEventListener('click', function(){
+        Array.prototype.forEach.call(root_.querySelectorAll('.bau textarea'), function(t){ t.value = z.bau[t.getAttribute('data-k')]; });
+        Object.keys(z.bau).forEach(function(k){ cur[k] = z.bau[k]; });
+        $('bauOut').textContent = assemble(cur);
+        growAll();
+      });
+      growAll();
+    }
+
+    /* Eigene Leistungen speichern */
+    var vals = eigenGet(s.id);
+    function updateMine(){
+      var txt = assembleEigen(s, vals);
+      var out = $('myOut'), box = $('myBox');
+      if (txt){ out.textContent = txt; box.removeAttribute('data-empty'); }
+      else { out.textContent = '(Noch leer: Fülle oben die Felder aus.)'; box.setAttribute('data-empty','1'); }
+      store.set('myprompt_'+s.id, txt);
+    }
+    Array.prototype.forEach.call(root_.querySelectorAll('[data-ek]'), function(t){
+      t.value = vals[t.getAttribute('data-ek')] || '';
+      t.addEventListener('input', function(){
+        vals[t.getAttribute('data-ek')] = t.value;
+        store.set('eigen_'+s.id, JSON.stringify(vals));
+        updateMine(); autoGrow(t);
+      });
+    });
+    updateMine();
+    [['fallIn','fall_'],['bestIn','best_'],['gedankeIn','gedanke_']].forEach(function(pr){
+      var el = $(pr[0]); if (!el) return;
+      el.value = store.get(pr[1]+s.id) || '';
+      el.addEventListener('input', function(){ store.set(pr[1]+s.id, el.value); });
+    });
+    autoGrowAll();
+
+    /* Notiz, erledigt */
+    var note = $('note');
+    note.value = store.get(noteKey(s.id)) || '';
+    note.addEventListener('input', function(){
+      store.set(noteKey(s.id), note.value);
+      store.set(transferKey(s.id), note.value);
+    });
+    $('btnDone').addEventListener('click', function(){
+      DONE[s.id] = !DONE[s.id]; if(!DONE[s.id]) delete DONE[s.id];
+      saveDone();
+      this.classList.toggle('done', !!DONE[s.id]);
+      this.textContent = DONE[s.id] ? '✓ Erledigt' : 'Als erledigt markieren';
+    });
+  }
+
+  /* Kopieren (für alle Prompt-Boxen) */
+  $('station').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('.copy') : null;
+    if (!b) return;
+    if (b.parentNode.getAttribute('data-empty')) return;
+    var txt = b.parentNode.querySelector('.ptxt').textContent;
+    function ok(){ b.textContent = 'Kopiert ✓'; setTimeout(function(){ b.textContent='Kopieren'; },1600); }
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); ok(); }catch(err){}
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback);
+    else fallback();
+  });
+
+  /* ===== Take-Home ===== */
+  function takeHomeItems(){
+    return S.filter(function(s){
+      var m = mineGet(s.id);
+      return DONE[s.id] || m.note || m.fall || m.prompt || m.best || m.gedanke;
+    }).map(function(s){
+      return {s:s, m:mineGet(s.id), kern:KERN[s.id], prompt:spickPrompt(s)};
+    });
+  }
+  function renderTakeHome(){
+    theme('#fbb900');
+    var main = $('mainTransfer');
+    main.value = store.get('main_transfer') || '';
+    main.oninput = function(){ store.set('main_transfer', main.value); };
+    var out = $('transferList'); out.innerHTML='';
+    var items = takeHomeItems();
+    if (!items.length){
+      out.innerHTML = '<p>Noch nichts hier. Hier erscheinen die Stationen, die du als erledigt markierst oder zu denen du etwas festgehalten hast.</p>';
+      return;
+    }
+    items.forEach(function(it){
+      var n = esc(plain(it.s.title)), m = it.m;
+      function blk(lbl, v){ return v ? '<p class="said">'+lbl+'</p><p class="mine">'+esc(v)+'</p>' : ''; }
+      var d = document.createElement('div'); d.className='transfer-item';
+      d.innerHTML =
+        '<div class="h">'+n+'</div>'+
+        '<p class="said">Zum Thema «'+n+'» habe ich mir notiert:</p>'+
+        '<p class="mine">'+(m.note ? esc(m.note) : '<i>(keine Notiz)</i>')+'</p>'+
+        blk('Mein Fall:', m.fall)+
+        (m.prompt ? '<p class="said">Mein Prompt:</p><div class="prompt own"><span class="ptxt">'+esc(m.prompt)+'</span></div>' : '')+
+        blk('Meine wirksamste Nachfrage:', m.best)+
+        blk('Mein Gedanke zum Weiterdenken:', m.gedanke)+
+        '<div class="spick"><div class="k">Spickzettel für später</div>'+
+          '<p>'+esc(it.kern)+'</p>'+
+          '<div class="prompt"><span class="lab">Prompt-Vorlage</span>'+esc(it.prompt)+'</div></div>';
+      out.appendChild(d);
+    });
+  }
+
+  function transferText(){
+    var out = ['Mein KI-Take-Home','',
+      'Ich werde KI verwenden, um …',
+      (store.get('main_transfer')||'(noch leer)'),''];
+    takeHomeItems().forEach(function(it){
+      var n = plain(it.s.title), m = it.m;
+      out.push('=== '+n+' ===',
+        'Zum Thema «'+n+'» habe ich mir notiert:',
+        m.note || '(keine Notiz)','');
+      if (m.fall) out.push('Mein Fall:', m.fall, '');
+      if (m.prompt) out.push('Mein Prompt:', m.prompt, '');
+      if (m.best) out.push('Meine wirksamste Nachfrage:', m.best, '');
+      if (m.gedanke) out.push('Mein Gedanke zum Weiterdenken:', m.gedanke, '');
+      out.push('Spickzettel für später:', it.kern, '', 'Prompt-Vorlage:', it.prompt, '', '');
+    });
+    return out.join('\n');
+  }
+  $('btnTxt').addEventListener('click', function(){
+    var blob = new Blob([transferText()], {type:'text/plain;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'mein-ki-take-home.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  });
+  $('btnCopy').addEventListener('click', function(){
+    var b = this, txt = transferText();
+    function ok(){ var o=b.textContent; b.textContent='Kopiert ✓'; setTimeout(function(){ b.textContent=o; },1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, function(){});
+  });
+
+  /* Titel: Schriftgrösse verkleinern, bis das längste Wort in die Spalte passt */
+  function fitTitles(){
+    Array.prototype.forEach.call(document.querySelectorAll('h1.title'), function(h){
+      if (h.offsetParent === null) return;
+      h.style.fontSize = '';
+      var px = parseFloat(getComputedStyle(h).fontSize), min = 26;
+      while (h.scrollWidth > h.clientWidth + 1 && px > min){
+        px *= 0.94; h.style.fontSize = px+'px';
+      }
+    });
+  }
+  window.addEventListener('resize', fitTitles);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitles);
+
+  /* ===== Routing ===== */
+  function show(which){
+    $('home').hidden = which!=='home';
+    $('station').hidden = which!=='station';
+    $('takehome').hidden = which!=='takehome';
+  }
+  function route(){
+    var h = (location.hash||'').replace('#','');
+    if (h==='takehome'){ show('takehome'); renderTakeHome(); }
+    else if (S.some(function(s){ return s.id===h; })){ show('station'); renderStation(h); }
+    else { show('home'); renderHome(); }
+    window.scrollTo(0,0);
+    fitTitles();
+  }
+  window.addEventListener('hashchange', route);
+
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'), function(c){
+    c.addEventListener('click', function(){
+      filter = parseInt(c.getAttribute('data-f'),10);
+      Array.prototype.forEach.call(document.querySelectorAll('.chip'), function(x){
+        x.setAttribute('aria-pressed', x===c ? 'true':'false');
+      });
+      renderHome();
+    });
+  });
+
+  /* Farbstreifen unten */
+  var strip = $('strip');
+  S.forEach(function(s){ var sp=document.createElement('span'); sp.style.background=s.bg; strip.appendChild(sp); });
+
+  route();
+})();
+</script>
+</body>
+</html>
