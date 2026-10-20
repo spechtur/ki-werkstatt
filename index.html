@@ -240,6 +240,21 @@
   .srow p.pre,.transfer-item .own .ptxt{white-space:pre-wrap}
   .transfer-item .own{margin:.3rem 0 1rem}
 
+
+  /* ---------- Poster-Inhalte: Säulen, Kriterien, Regel, Rezept ---------- */
+  .schema.three{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .schema.six{grid-template-columns:repeat(auto-fit,minmax(285px,1fr))}
+  .schema.eight{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .schema.three .ck{font-size:1.15rem}
+  .card.must{background:var(--fg);color:var(--bg)}
+  .card.must .cq{opacity:1}
+  .pflicht{position:absolute;top:.7rem;right:.8rem;font-weight:800;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;border:.12em solid currentColor;border-radius:99px;padding:.15em .7em}
+  .card.must .no{opacity:.8}
+  .regel{background:var(--fg);color:var(--bg);border-radius:.9rem;padding:1.1rem 1.4rem;margin:1.6rem 0;max-width:52em}
+  .regel .k{font-weight:800;text-transform:uppercase;letter-spacing:.18em;font-size:.75rem;margin-bottom:.4rem;opacity:.85}
+  .regel p{font-weight:700;font-size:1.08rem;line-height:1.5;max-width:none}
+  .pill{align-self:flex-start;border:.12em solid var(--fg);border-radius:99px;padding:.2em .8em;font-weight:800;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase}
+
   /* ---------- Transfer ---------- */
   .transfer-item{border:.17rem solid var(--fg);border-radius:.8rem;padding:1rem 1.2rem;margin-bottom:1rem;max-width:46em}
   .transfer-item .h{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:.85rem;margin-bottom:.4rem}
@@ -1470,6 +1485,114 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
       transfer:'Welche Regel oder Frage bringst du in den nächsten Wochen in deine Klasse? Halte sie fest.',
       check:['ihr mindestens zwei Regeln formuliert habt.','du erklären kannst, wann KI Lernen unterstützt und wann sie es ersetzt.','du weisst, was du Kindern über KI vermitteln willst.'],
       vorlage:'Formuliere für eine [Stufe] [Anzahl] Regeln zum Umgang mit KI in Kindersprache. Berücksichtige: Daten schützen, Quellen prüfen, selbst denken, ehrlich sagen, wenn KI geholfen hat, Verantwortung übernehmen. Je ein Beispiel dazu.'
+    },
+
+    { id:'robust', title:'KI-robuste Aufgaben', bg:'#9be564', level:3, min:'40', sub:'Aufgaben entwerfen, die mit KI funktionieren statt dagegen.',
+      tag:'Vertiefung für Fortgeschrittene',
+      voraus:'Mindestens zwei andere Stationen, zum Beispiel «Prompting» und «Halluzinationen & Quellen».',
+      mitnehmen:'Eine eigene Aufgabenskizze, die KI produktiv einbindet und Entscheiden, Begründen und Reflektieren ins Zentrum stellt.',
+      brauchst:'Ein KI-Tool deiner Wahl und ein Thema, das du bald unterrichtest',
+      hinfuehrung:'Viele Aufgaben lassen sich heute in Sekunden mit KI lösen. Statt zu verbieten, kann man Aufgaben so bauen, dass KI zum Werkzeug wird und Denken, Entscheiden und Begründen im Zentrum bleiben. Eine KI-robuste Aufgabe funktioniert nicht trotz, sondern mit generativer KI.',
+      saeulen:[
+        {k:'Produktive KI-Nutzung', q:'KI ist Werkzeug, nicht Gegner: gezielt und sichtbar in den Lernprozess eingebaut.'},
+        {k:'Prozessorientierung', q:'Der Weg wird dokumentiert und selbst zum Lerngegenstand, nicht nur das Endprodukt.'},
+        {k:'Kritische Reflexion', q:'KI-Output wird hinterfragt, geprüft und eingeordnet, nie einfach übernommen.'}
+      ],
+      kartenTitel:'Sechs Grundkriterien',
+      karten:[
+        {k:'Nicht substituierbar', q:'Verlangt genuin menschliche Fähigkeiten: Kontextverständnis, Urteilskraft, Verantwortung.'},
+        {k:'Auf KI angewiesen', q:'Ohne KI wäre die Aufgabe in Tiefe, Reichweite oder Effizienz nicht zu bewältigen.'},
+        {k:'Ko-Konstruktion Mensch–KI', q:'Das Ergebnis entsteht im Zusammenspiel von menschlichem Denken und KI-Teilprozessen.'},
+        {k:'Notwendige Ko-Autorenschaft', q:'Substanzielle Beiträge von Mensch und KI, aufeinander bezogen, nicht additiv oder austauschbar.'},
+        {k:'Interaktive Bearbeitungslogik', q:'KI-Ausgaben sind Zwischenschritte im Denkprozess, nicht Endprodukte.'},
+        {k:'Reflexionsbedürftigkeit', q:'Kritische Auseinandersetzung mit Quellen, Bias und Verlässlichkeit der KI ist gefordert.'}
+      ],
+      regel:'Jede Aufgabe muss mindestens eine Situation enthalten, in der Lernende unter Unsicherheit eine Entscheidung treffen und begründen müssen, nicht nur KI-Output prüfen oder korrigieren.',
+      erklaert:[
+        '«KI-robust» heisst nicht «KI-sicher» im Sinne von Kontrolle, sondern <b>tragfähig unter den Bedingungen von KI</b>. Die Aufgabe setzt voraus, dass Lernende ein Standard-KI-Tool nutzen können, und macht genau das zum Gestaltungselement.',
+        'Es gibt eine <b>schwache</b> Ko-Autorenschaft (KI generiert, Mensch kontrolliert nur) und eine <b>starke</b> (Lernende entscheiden, was relevant ist, stellen Kohärenz her und können ihren Denkweg begründen). Nur die starke zählt.',
+        'Die Orientierung am <b>Lehrplan 21</b> wirkt im Hintergrund: Du prüfst intern, welche Kompetenzen im Fokus stehen. Im Aufgabentext für Lernende muss das nicht erscheinen.'
+      ],
+      stolper:[
+        '<b>Nur absichern:</b> Eine Aufgabe KI-sicher machen zu wollen, ist etwas anderes, als sie KI-robust zu bauen.',
+        '<b>Nur kontrollieren:</b> Lernende prüfen KI-Output, entscheiden aber nichts.',
+        '<b>Wörtliche Prompts:</b> Wer den Wortlaut vorgibt, nimmt den Lernenden das Denken.',
+        '<b>Reflexion als Anhängsel:</b> Sie gehört zur Bewertung, mit mindestens 50 % Prozessanteil.'
+      ],
+      stufenNur:[2,3],
+      rezept:[
+        {k:'Kontextanker wählen', q:'Lokal (Ort, Region) oder alternativ: eigene Lebenswelt, Biografie, ein global relevantes Thema.'},
+        {k:'Ausgangsszenario und Material', q:'Ein konkreter, authentischer Fall statt abstrakter Aufgabenstellung. Material bewusst analog und digital mischen.'},
+        {k:'Fakten sammeln lassen', q:'Recherche mit Quellenangabe (Fundstelle und Datum), analog dokumentiert.'},
+        {k:'KI gezielt einsetzen', q:'Nur Ziel und Kriterien des Prompts vorgeben, nie den Wortlaut. Lernende formulieren selbst.'},
+        {k:'Kritisch prüfen', q:'Was stimmt nachweislich? Was ist unsicher? Was hat die KI erfunden oder ausgelassen?'},
+        {k:'Echte Entscheidung verlangen', must:true, q:'Eine Situation, in der unter Unsicherheit entschieden und begründet wird, plus Box «Warum braucht es KI und Mensch?».'},
+        {k:'Austausch und Prozessreflexion', q:'Peer-Feedback zu Zwischenständen; schriftliche Reflexion mit Unterschrift aller Beteiligten.'},
+        {k:'Bewertungsraster und Abschluss', q:'Prozessanteil mindestens 50 % der Bewertung; verbindlicher Reflexionsprompt an die KI zum Schluss.'}
+      ],
+      rezeptHinweis:'Die acht Bausteine sind eine mögliche Umsetzung der sechs Kriterien, kein starres Schema. Sie gelten für den komplexen Typ (Mehrphasen-Projekt ab Zyklus 3). Im kompakten Mittelstufen-Format gelten die Grundprinzipien vereinfacht.',
+      vorPraes:'Halte jeden Entwurf gegen die sechs Kriterien. Nicht erfüllte Punkte: überarbeiten oder die Abweichung benennen und begründen.',
+      mehr:{text:'Mehr dazu: Beispiele, Bauanleitung und Hintergründe im offenen Projekt «KI-robuste Aufgaben» (David Halser, PHGR).', url:'https://github.com/ki-didaktik-labor/ki-robuste-aufgaben'},
+      stufen:{
+        2:{ thema:'Vom Vortrag zur Entscheidung: Verkehr vor dem Schulhaus', szenario:'Du vergibst bisher die Aufgabe «Schreibt einen Vortrag über den Verkehr rund um unser Schulhaus». Du möchtest sie für eine 5./6. Klasse KI-robust umbauen.',
+          steps:[
+            {h:'Alte Aufgabe prüfen lassen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Analyse',
+             t:`Du bist eine Fachperson für Aufgabendesign. Hier ist eine Aufgabe für eine 5./6. Klasse:
+«Schreibt einen Vortrag über den Verkehr rund um unser Schulhaus.»
+Prüfe die Aufgabe gegen diese sechs Kriterien einer KI-robusten Aufgabe: (1) nicht durch KI substituierbar, (2) auf KI angewiesen, (3) Ko-Konstruktion Mensch–KI, (4) notwendige Ko-Autorenschaft (echte Entscheidung unter Unsicherheit), (5) interaktive Bearbeitungslogik (KI-Output als Zwischenschritt), (6) Reflexionsbedürftigkeit.
+Gib für jedes Kriterium an: erfüllt / teilweise / nicht erfüllt, mit einem Satz Begründung. Fasse danach zusammen, was die KI an dieser Aufgabe allein erledigen könnte.`},
+            {h:'Aufgabe umbauen lassen.', d:'Du beschreibst nur Ziele und Kriterien, nicht den Wortlaut für die Lernenden.', lab:'Umbau',
+             t:`Entwirf aus der Aufgabe eine KI-robuste Variante für eine 5./6. Klasse (ca. 90 Minuten, Gruppenarbeit). Verwende diese Bausteine: ein lokaler Kontextanker (unser Schulhaus), Fakten sammeln und analog festhalten (Fundstelle und Datum), gezielter KI-Einsatz (beschreibe nur Ziel und Kriterien des Prompts, keinen Wortlaut), kritisches Prüfen der KI-Antwort, eine echte Entscheidung unter Unsicherheit mit schriftlicher Begründung (zum Beispiel eine Empfehlung an die Gemeinde zu einer Haltezone vor dem Schulhaus), eine kurze Reflexion. Gib die Phasen als Tabelle aus (Phase, Aufgabe der Lernenden, Rolle der KI).`},
+            {h:'Box «Warum braucht es KI und Mensch?».', d:'Ein bewährtes Element für die Lernenden.', lab:'Box',
+             t:`Formuliere für Kinder einer 5./6. Klasse eine Box «Warum braucht es KI und Mensch?» zur Aufgabe «Verkehr vor dem Schulhaus» (höchstens 60 Wörter): Was geht ohne Menschen nicht? Was geht ohne KI nicht? Was leistet die Verbindung?`}
+          ],
+          beispiel:`Aufgabe «Elterntaxi vor dem Schulhaus» (Skizze)
+
+1. Ausgangslage: Vor dem Schulhaus staut es sich jeden Morgen. Die Gemeinde fragt: Soll eine Haltezone eingerichtet werden?
+2. Fakten sammeln (analog): Zählt 15 Minuten lang, wie viele Autos halten. Notiert Fundstelle und Datum.
+3. KI einsetzen: Ihr lasst euch Argumente aus Sicht von Eltern, Kindern, Anwohnenden und Gemeinde sammeln. Euer Prompt nennt eure Zählung und verlangt mindestens zwei Interpretationen.
+4. Kritisch prüfen: Was stimmt nachweislich? Was ist unsicher? Was hat die KI erfunden oder ausgelassen?
+5. Entscheiden: Gebt der Gemeinde eine Empfehlung und begründet schriftlich, auch warum ihr anderen Argumenten nicht folgt.
+6. Box «Warum braucht es KI und Mensch?»: KI sammelt schnell viele Sichtweisen. Entscheiden und Verantwortung liegen bei euch, vor Ort.
+7. Reflexion: Was hat die KI erledigt? Was konntet nur ihr beitragen?`,
+          pruef:['Gibt es eine Stelle, an der Kinder wirklich entscheiden müssen und nicht nur KI-Antworten prüfen?','Beschreiben die Prompt-Vorgaben nur Ziel und Kriterien, nicht den Wortlaut?','Ist der Kontext echt und für deine Klasse greifbar?','Ist die Aufgabe in der verfügbaren Zeit machbar?'],
+          nachfragen:['Schlage zwei andere Kontextanker vor, die zu einer ländlichen Gemeinde passen.','Formuliere die Reflexionsfragen in Kindersprache.','Welche Kriterien würdest du für ein kurzes Bewertungsraster mit Prozessanteil verwenden?']},
+        3:{ thema:'Vom Aufsatz zur Empfehlung: Solaranlage auf dem Schuldach', szenario:'Du vergibst bisher die Aufgabe «Schreibe einen Aufsatz zu erneuerbaren Energien in der Schweiz». Du möchtest sie für eine 8./9. Klasse als Mehrphasen-Projekt KI-robust umbauen.',
+          steps:[
+            {h:'Alte Aufgabe prüfen lassen.', d:'Kopiere den Prompt in dein KI-Tool.', lab:'Analyse',
+             t:`Du bist eine Fachperson für Aufgabendesign. Hier ist eine Aufgabe für eine 8./9. Klasse:
+«Schreibe einen Aufsatz zu erneuerbaren Energien in der Schweiz.»
+Prüfe die Aufgabe gegen diese sechs Kriterien einer KI-robusten Aufgabe: (1) nicht durch KI substituierbar, (2) auf KI angewiesen, (3) Ko-Konstruktion Mensch–KI, (4) notwendige Ko-Autorenschaft (echte Entscheidung unter Unsicherheit), (5) interaktive Bearbeitungslogik (KI-Output als Zwischenschritt), (6) Reflexionsbedürftigkeit.
+Gib für jedes Kriterium an: erfüllt / teilweise / nicht erfüllt, mit einem Satz Begründung. Fasse danach zusammen, was die KI an dieser Aufgabe allein erledigen könnte.`},
+            {h:'Aufgabe umbauen lassen.', d:'Du beschreibst nur Ziele und Kriterien, nicht den Wortlaut für die Lernenden.', lab:'Umbau',
+             t:`Entwirf aus der Aufgabe ein KI-robustes Mehrphasen-Projekt für eine 8./9. Klasse (ca. 4 Lektionen, Gruppenarbeit). Verwende diese Bausteine: lokaler Kontextanker (Soll unsere Gemeinde auf dem Schulhausdach eine Solaranlage bauen?), authentisches Material (Stromrechnung, Dachpläne, analog und digital gemischt), Fakten sammeln mit Fundstelle und Datum, gezielter KI-Einsatz (nur Ziel und Kriterien der Prompts, kein Wortlaut), kritisches Prüfen der KI-Antwort, eine echte Entscheidung unter Unsicherheit (Empfehlung an den Gemeinderat mit schriftlicher Begründung), Austausch zwischen den Gruppen, Prozessreflexion mit Unterschrift, Abschluss-Reflexionsprompt an die KI. Gib die Phasen als Tabelle aus (Phase, Aufgabe der Lernenden, Rolle der KI).`},
+            {h:'Bewertungsraster mit Prozessanteil.', d:'Mindestens die Hälfte der Bewertung liegt auf dem Prozess.', lab:'Raster',
+             t:`Erstelle für das Projekt «Solaranlage auf dem Schuldach» ein Bewertungsraster (Tabelle: Kriterium, Beschreibung, Indikatoren). Der Prozessanteil beträgt mindestens 50 %. Mindestkriterien: Dokumentation, Reflexionstiefe, kritische Distanz, Begründungsqualität der Entscheidung.`}
+          ],
+          beispiel:`Projekt «Solaranlage auf dem Schuldach» (Skizze)
+
+Phase 1, Ausgangslage: Die Gemeinde prüft eine Solaranlage auf dem Schulhausdach. Der Gemeinderat verlangt eine Empfehlung der Klasse. Material: Stromrechnung (Auszug), Dachplan, Zugang zu einem KI-Tool.
+Phase 2, Fakten sammeln (analog): Verbrauch, Dachfläche, Ausrichtung ermitteln. Jede Angabe mit Fundstelle und Datum.
+Phase 3, KI einsetzen: Die Gruppen lassen sich Szenarien durchrechnen und Argumente sammeln. Euer Prompt enthält eure Daten und verlangt mindestens zwei Interpretationen.
+Phase 4, Kritisch prüfen: Was stimmt nachweislich? Welche Annahmen sind unsicher? Was hat die KI erfunden oder ausgelassen?
+Phase 5, Entscheiden: Ihr gebt eine Empfehlung ab und begründet sie schriftlich, auch gegen Argumente, die für das Gegenteil sprechen. Könnt ihr eure Begründung ohne KI erklären?
+Phase 6, Box «Warum braucht es KI und Mensch?»
+Phase 7, Austausch: Gruppen zeigen sich Zwischenstände und geben Rückmeldung.
+Phase 8, Prozessreflexion mit Unterschrift aller Beteiligten. Abschluss-Reflexionsprompt an die KI.
+
+Bewertung: Prozessanteil mindestens 50 %.`,
+          pruef:['Ist der Prozessanteil im Raster mindestens 50 %?','Gibt es eine echte Entscheidung unter Unsicherheit mit schriftlicher Begründung?','Werden Prompts nur als Ziel und Kriterien beschrieben?','Welche Lehrplan-Kompetenzen (Fachbereich, überfachlich, Medien und Informatik) stehen im Fokus? Prüfe sie im Lehrplan.'],
+          nachfragen:['Schlage zwei weitere Kontextanker vor, die zu meiner Gemeinde passen könnten.','Formuliere den Abschluss-Reflexionsprompt für Jugendliche.','Welche Stolpersteine könnten bei der Entscheidungsphase auftreten und wie begegne ich ihnen?']}
+      },
+      weiterKarten:[
+        {t:'Gegen die sechs Kriterien prüfen', e:'Der Selbsttest vor der Präsentation. Nicht erfüllte Punkte überarbeiten oder die Abweichung begründen.', p:'Prüfe meinen Aufgabenentwurf gegen die sechs Kriterien einer KI-robusten Aufgabe (nicht substituierbar, auf KI angewiesen, Ko-Konstruktion, notwendige Ko-Autorenschaft, interaktive Bearbeitungslogik, Reflexionsbedürftigkeit). Gib je Kriterium erfüllt / teilweise / nicht erfüllt an und schlage bei Lücken eine Änderung vor.\n\n[Entwurf einfügen]'},
+        {t:'Die echte Entscheidung schärfen', e:'Die Regel: mindestens eine Situation, in der unter Unsicherheit entschieden und begründet wird.', p:'Hier ist mein Aufgabenentwurf: [Entwurf einfügen]. Gibt es eine Stelle, an der Lernende unter Unsicherheit wirklich entscheiden und begründen müssen, oder prüfen sie nur KI-Output? Wenn nicht, schlage drei mögliche Entscheidungssituationen vor.'},
+        {t:'Box «Warum braucht es KI und Mensch?»', e:'Macht sichtbar, was jede Seite beiträgt.', p:'Formuliere für die Lernenden eine Box «Warum braucht es KI und Mensch?» (höchstens 60 Wörter): Was geht ohne Menschen nicht? Was geht ohne KI nicht? Was leistet die Verbindung? Thema: [Thema].'},
+        {t:'Bewertungsraster mit Prozessanteil', e:'Prozess zählt mindestens die Hälfte.', p:'Erstelle ein Bewertungsraster für diese Aufgabe (Tabelle: Kriterium, Beschreibung, Indikatoren). Der Prozessanteil beträgt mindestens 50 %. Mindestkriterien: Dokumentation, Reflexionstiefe, kritische Distanz, Begründungsqualität der Entscheidung.\n\n[Aufgabe einfügen]'},
+        {t:'Abschluss-Reflexionsprompt', e:'Lernende kopieren ihn ans Ende ihrer KI-Konversation und lassen sich die Zusammenarbeit bewerten.', p:'Formuliere einen Reflexionsprompt, den Lernende am Ende ihrer Konversation einfügen. Die KI soll rückblickend beschreiben, welche Teile sie übernommen hat, wo die Lernenden kritisch nachgefragt haben und wo die Zusammenarbeit zwischen Mensch und KI gut oder schlecht funktioniert hat.'}
+      ],
+      transfer:'Für welches Thema in deinem Unterricht könntest du eine KI-robuste Aufgabe entwerfen? Halte Thema, Kontext und die Entscheidung fest.',
+      check:['die Aufgabe mindestens eine echte Entscheidung unter Unsicherheit mit Begründung verlangt.','die Prompts der Lernenden nur als Ziel und Kriterien beschrieben sind.','ein Bewertungsraster mit mindestens 50 % Prozessanteil vorliegt.']
     }
   ];
 
@@ -1664,6 +1787,25 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
         {t:'Haltung und Vorbild', text:'Kinder beobachten, wie Erwachsene mit KI umgehen. Wie du sie nutzt, kennzeichnest und begrenzt, wirkt stärker als jede Regel.', fragen:['Wie machst du deine eigene KI-Nutzung gegenüber Kindern sichtbar?','Welche Haltung möchtest du ihnen vermitteln?']}
       ]}
   };
+  EXTRA.robust = {
+    min:'40',
+    vorlage:'Du bist eine erfahrene Lehrperson der [Stufe] in der Deutschschweiz. Entwirf eine KI-robuste Aufgabe zu [Thema] nach diesen sechs Kriterien: nicht substituierbar, auf KI angewiesen, Ko-Konstruktion Mensch–KI, notwendige Ko-Autorenschaft, interaktive Bearbeitungslogik, Reflexionsbedürftigkeit.\nKontextanker: [lokal oder Lebenswelt]\nPflicht-Entscheidung: [Situation mit Entscheidung unter Unsicherheit und Begründung]\nKI-Einsatz: Prompts für Lernende nur als Ziel und Kriterien beschreiben, nie als Wortlaut.\nBewertung: Prozessanteil mindestens 50 %.',
+    eigen:{ titel:'Dein eigener Aufgabenentwurf', auftrag:'Skizziere mit einem eigenen Prompt eine KI-robuste Aufgabe zu einem Thema, das du bald unterrichtest. Die acht Bausteine des Rezepts sind deine Grundlage. Eine Vorlage zum Kopieren gibt es nicht.',
+      faelle:['Eine bestehende Aufgabe, die KI heute allein lösen könnte','Ein Thema mit lokalem Bezug (Gemeinde, Region, Schule)','Ein Projekt, das du bisher als Aufsatz oder Vortrag vergibst'],
+      felder:[
+        {key:'thema', label:'Thema, Stufe und Lernziel', leit:'Wofür entwirfst du die Aufgabe?', hilfe:['Du bist eine erfahrene Lehrperson der [Stufe] in der Deutschschweiz. Entwirf eine KI-robuste Aufgabe zu [Thema]. Lernziel: …']},
+        {key:'kontext', label:'Kontextanker', pre:'Kontextanker: ', leit:'Welcher authentische, lokale oder lebensnahe Fall?', hilfe:['Lokal: Ort, Gemeinde, Region, Schule. Alternativ: eigene Lebenswelt, Biografie, ein global relevantes Thema.']},
+        {key:'entscheidung', label:'Echte Entscheidung (Pflicht)', pre:'Pflicht-Entscheidung: ', leit:'Welche Situation verlangt eine Entscheidung unter Unsicherheit und eine Begründung?', hilfe:['Eine Empfehlung abgeben, eine Position wählen oder eine von mehreren KI-Varianten auswählen und verteidigen.']},
+        {key:'ki', label:'KI-Einsatz der Lernenden', pre:'KI-Einsatz: ', leit:'Welches Ziel, welche Kriterien? Nie den Wortlaut vorgeben.', hilfe:['Zum Beispiel: «Formuliert einen Prompt, der eure Daten enthält und nach mindestens zwei Interpretationen fragt.»']},
+        {key:'bewertung', label:'Bewertung', pre:'Bewertung: ', leit:'Welcher Prozessanteil, welche Kriterien?', hilfe:['Prozessanteil mindestens 50 %. Mindestkriterien: Dokumentation, Reflexionstiefe, kritische Distanz, Begründungsqualität der Entscheidung.']}
+      ],
+      sc:['die Aufgabe etwas verlangt, das KI nicht liefern kann (Kontextverständnis, Urteilskraft, Verantwortung).','die Aufgabe ohne KI in Tiefe, Reichweite oder Effizienz nicht zu bewältigen wäre.','das Ergebnis aus dem Zusammenspiel von Mensch und KI entsteht und nicht nebeneinander.','es eine Stelle gibt, an der Lernende unter Unsicherheit entscheiden und begründen müssen.','KI-Ausgaben Zwischenschritte sind, die geprüft und weitergeführt werden.','Quellen, Bias oder Verlässlichkeit der KI zum Thema werden.','die Prompts für Lernende nur als Ziel und Kriterien beschrieben sind.']},
+    denken:[
+      {t:'Chancen und Risiken', text:'Solche Aufgaben machen Denken, Entscheiden und Begründen sichtbar und nehmen den Druck, KI-Nutzung zu verstecken. Sie sind aber aufwändiger zu planen und zu bewerten als eine klassische Aufgabe, und ein grosser Teil der Bewertung hängt am Prozess.', fragen:['Welche deiner Aufgaben würde sich lohnen, so umzubauen?','Wie viel Mehraufwand ist für dich realistisch?']},
+      {t:'Gerechtigkeit und Zugang', text:'Die Aufgaben setzen voraus, dass Lernende ein KI-Tool nutzen können. Das hängt von Geräten, Konten, Altersvorgaben, Einverständnis und Datenschutz ab. Nicht alle Kinder haben zuhause dieselben Voraussetzungen.', fragen:['Wie stellst du sicher, dass alle Kinder in der Schule Zugang haben?','Wie gehst du mit Altersvorgaben und Datenschutz um (Pseudonyme, Einverständnis)?']},
+      {t:'Ähnliche Szenarien', text:'Das Prinzip lässt sich auf Hausaufgaben, Vorträge, Projektarbeiten oder Portfolios übertragen: Wo immer ein Produkt entsteht, kann auch der Weg dorthin beurteilt werden.', fragen:['Welche Aufgabe, die du schon hast, ist am wenigsten KI-robust?','Was würdest du dort zuerst verändern?']},
+      {t:'Bewertung und Haltung', text:'Wenn mindestens die Hälfte der Bewertung auf dem Prozess beruht, verändert sich, was Lernen und Leistung heissen. Dafür braucht es Klarheit gegenüber Kindern, Eltern und Schulleitung.', fragen:['Wie erklärst du Eltern, dass der Prozess mindestens die Hälfte der Bewertung ausmacht?','Was ändert sich in deiner Rolle, wenn du Denkwege statt nur Ergebnisse bewertest?']}
+    ]};
   S.forEach(function(s){
     var x = EXTRA[s.id];
     if (!x) return;
@@ -1679,7 +1821,7 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
   S.forEach(function(s){
     if (!s.stufen) return;
     [1,2,3].forEach(function(n){
-      var z = s.stufen[n];
+      var z = s.stufen[n]; if (!z) return;
       z.label = z.label || META[n].label;
       z.sub = z.sub || META[n].sub;
     });
@@ -1687,6 +1829,7 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
 
   /* Kurzfassung je Station für den Spickzettel */
   var KERN = {
+    robust:'Sechs Kriterien: nicht ersetzbar, auf KI angewiesen, Ko-Konstruktion, Ko-Autorenschaft, interaktive Bearbeitung, Reflexion. Die Regel: mindestens eine echte Entscheidung unter Unsicherheit mit Begründung. Prozessanteil in der Bewertung mindestens 50 %.',
     prompting:'Rolle – Auftrag – Kontext – Kriterien – Ausgabeformat. Der erste Entwurf ist nie das Ergebnis: nachfragen, verfeinern, Rückfragen zulassen.',
     eltern:'Aus Stichworten einen Entwurf schreiben lassen, in Leichte Sprache vereinfachen, übersetzen lassen und prüfen. Zahlen, Daten und Ton immer selbst kontrollieren.',
     differenzieren:'Dasselbe Lernziel auf drei Niveaus: stützen (Hilfen, Wortschatz), Standard, fordern (offener, begründen). Das Niveau im Prompt ausdrücklich nennen.',
@@ -1700,7 +1843,7 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
     schueler:'Wann hilft KI beim Lernen, wann nimmt sie es ab? Sechs Grundsätze: Ressourcen schonen, Daten schützen, Quellen prüfen, selbst denken, transparent sein, Verantwortung übernehmen.'
   };
   function spickPrompt(s){
-    var z = s.stufen ? s.stufen[getStufe()] : null;
+    var z = s.stufen ? s.stufen[getStufe(s)] : null;
     if (z && z.bau) return assemble(z.bau);
     return s.vorlage || '';
   }
@@ -1725,6 +1868,7 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
         '<span class="tick" aria-hidden="true">'+(DONE[s.id]?'✓':'')+'</span>'+
         '<span class="t">'+s.title+'</span>'+
         '<span class="s">'+esc(s.sub)+'</span>'+
+        (s.tag ? '<span class="pill">'+esc(s.tag)+'</span>' : '')+
         '<span class="meta">'+lvlBadge(s.level)+'<span>ca. '+s.min+' Min.</span></span>';
       g.appendChild(a);
     });
@@ -1741,9 +1885,12 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
   function list(items, cls){
     return '<ul'+(cls?' class="'+cls+'"':'')+'>'+items.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ul>';
   }
-  function getStufe(){
+  function getStufe(s){
     var v = parseInt(store.get('stufe'),10);
-    return (v>=1 && v<=3) ? v : 2;
+    if (!(v>=1 && v<=3)) v = 2;
+    var ok = (s && s.stufenNur) || [1,2,3];
+    if (ok.indexOf(v) < 0) v = v < ok[0] ? ok[0] : ok[ok.length-1];
+    return v;
   }
   function assemble(b){
     return b.rolle+'\n'+b.auftrag+'\nKontext: '+b.kontext+'\nKriterien: '+b.kriterien+'\nAusgabeformat: '+b.format;
@@ -1754,19 +1901,25 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
   function sub(t){ return '<h3 class="sub">'+t+'</h3>'; }
 
   /* ----- Panel 1: Verstehen ----- */
+  function cardsHtml(items, cls, ex){
+    return '<div class="schema '+(cls||'')+'">'+items.map(function(c,i){
+      var e = ex ? ex(c) : '';
+      return '<div class="card'+(c.must?' must':'')+'"><span class="no">0'+(i+1)+'</span>'+(c.must?'<span class="pflicht">Pflicht</span>':'')+
+        '<div class="ck">'+esc(c.k)+'</div><div class="cq">'+esc(c.q||'')+'</div>'+(e?'<div class="ce">'+esc(e)+'</div>':'')+'</div>';
+    }).join('')+'</div>';
+  }
   function panelVerstehen(s, z){
     var h = '<p class="lede">'+esc(s.hinfuehrung)+'</p>';
+    if (s.saeulen) h += sub('Drei Säulen')+cardsHtml(s.saeulen, 'three');
     var cards = s.schema || s.karten;
     if (cards){
-      h += sub(esc(s.kartenTitel || 'Das Grundschema'))+'<div class="schema">'+cards.map(function(c,i){
-        var ex = (s.schema && z && z.bau) ? z.bau[c.key] : '';
-        return '<div class="card"><span class="no">0'+(i+1)+'</span><div class="ck">'+esc(c.k)+'</div><div class="cq">'+esc(c.q||'')+'</div>'+
-          (ex?'<div class="ce">'+esc(ex)+'</div>':'')+'</div>';
-      }).join('')+'</div>';
+      h += sub(esc(s.kartenTitel || 'Das Grundschema'))+cardsHtml(cards, s.karten && s.karten.length===6 ? 'six' : '', function(c){ return (s.schema && z && z.bau) ? z.bau[c.key] : ''; });
       if (s.schema && z) h += '<p class="hint">Die Beispiele in den Karten gehören zum gewählten Szenario: <b>'+esc(z.thema)+'</b> ('+esc(z.label)+').</p>';
     }
+    if (s.regel) h += '<div class="regel"><div class="k">Die Regel</div><p>'+esc(s.regel)+'</p></div>';
     h += sub('Kurz erklärt')+list(s.erklaert);
     if (s.stolper) h += sub('Typische Stolpersteine')+list(s.stolper);
+    if (s.mehr) h += '<p class="hint">'+esc(s.mehr.text)+' <a href="'+s.mehr.url+'" target="_blank" rel="noopener">'+s.mehr.url.replace('https://','')+'</a></p>';
     return h;
   }
 
@@ -1827,6 +1980,11 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
     var e = s.eigen, vals = eigenGet(s.id);
     var h = '<div class="szen"><div class="k">Jetzt bist du dran</div><p><b>'+esc(e.titel)+'</b></p><p>'+esc(e.auftrag)+'</p>'+
       '<p class="small"><b>Datenschutz:</b> Verwende erfundene Namen und Platzhalter wie [Name]. Keine echten Angaben zu Kindern, Eltern oder Kolleginnen.</p></div>';
+    if (s.rezept){
+      h += sub('Das Rezept: acht Bausteine')+cardsHtml(s.rezept, 'eight')+
+        '<p class="small">'+esc(s.rezeptHinweis||'')+'</p>'+
+        (s.vorPraes ? '<div class="regel"><div class="k">Vor der Präsentation</div><p>'+esc(s.vorPraes)+'</p></div>' : '');
+    }
     h += '<ol class="flow">';
 
     h += '<li><b>Fall wählen.</b> Welcher Fall aus deinem Alltag der nächsten Wochen passt? Zum Beispiel:'+list(e.faelle)+
@@ -1841,12 +1999,11 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
       '<p class="small">Dein Prompt entsteht unten automatisch aus deinen Feldern.</p>'+
       '<div class="prompt" data-empty="1" id="myBox"><span class="lab">Mein Prompt</span><span class="ptxt" id="myOut">(Noch leer: Fülle oben die Felder aus.)</span><button class="copy" type="button">Kopieren</button></div></li>';
 
+    var scItems = e.sc ? e.sc : e.felder.filter(function(f){ return !f.intern; }).map(function(f){
+      return '«'+f.label+'» konkret und in deinen Worten angegeben ist.';
+    }).concat(['keine echten Namen oder Angaben zu Personen enthalten sind.','die KI nichts raten muss, was du eigentlich weisst.']);
     h += '<li><b>Selbst prüfen.</b> Bevor du den Prompt abschickst, prüfe kritisch, ob …<ul class="check">'+
-      e.felder.filter(function(f){ return !f.intern; }).map(function(f){
-        return '<li><label><input type="checkbox"><span>«'+esc(f.label)+'» konkret und in deinen Worten angegeben ist.</span></label></li>';
-      }).join('')+
-      '<li><label><input type="checkbox"><span>keine echten Namen oder Angaben zu Personen enthalten sind.</span></label></li>'+
-      '<li><label><input type="checkbox"><span>die KI nichts raten muss, was du eigentlich weisst.</span></label></li></ul></li>';
+      scItems.map(function(t){ return '<li><label><input type="checkbox"><span>'+esc(t)+'</span></label></li>'; }).join('')+'</ul></li>';
 
     h += '<li><b>Abschicken.</b> Kopiere deinen Prompt in dein KI-Tool und lies das Ergebnis. Es ist im nächsten Schritt die Grundlage fürs Verfeinern.</li>';
 
@@ -1921,7 +2078,7 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
     curId = id;
     theme(s.bg);
     var prev = S[idx-1], next = S[idx+1];
-    var sv = s.stufen ? getStufe() : 0;
+    var sv = s.stufen ? getStufe(s) : 0;
     var z = s.stufen ? s.stufen[sv] : null;
     var nm = function(x){ return esc(plain(x.title)); };
 
@@ -1940,11 +2097,12 @@ Ich darf KI nutzen, um zu verstehen. Ich gebe nichts als meine Arbeit ab, was ic
         '<div><div class="k">Dauer</div><div class="v">ca. '+s.min+' Min.</div></div>'+
         '<div><div class="k">Du brauchst</div><div class="v">'+esc(s.brauchst)+'</div></div>'+
         '<div class="wide"><div class="k">Das nimmst du mit</div><div class="v">'+esc(s.mitnehmen)+'</div></div>'+
+        (s.voraus ? '<div class="wide"><div class="k">Voraussetzung</div><div class="v">'+esc(s.voraus)+'</div></div>' : '')+
         '<div class="wide"><div class="k">Datenschutz</div><div class="v">Nur fiktive Daten verwenden. Keine echten Namen oder Beobachtungen zu Kindern.</div></div>'+
       '</div>'+
       (s.stufen ?
         '<div class="stufen" role="group" aria-label="Stufe wählen"><span class="lbl">Für welche Stufe?</span>'+
-        [1,2,3].map(function(n){
+        (s.stufenNur||[1,2,3]).map(function(n){
           var o = s.stufen[n];
           return '<button class="chip stufe" type="button" data-z="'+n+'" aria-pressed="'+(n===sv?'true':'false')+'">'+esc(o.label)+'<small>'+esc(o.sub)+'</small></button>';
         }).join('')+'</div>' : '')+

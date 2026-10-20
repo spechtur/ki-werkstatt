@@ -2,11 +2,11 @@
 
 Eine selbstständig erkundbare Lernwerkstatt zum Einsatz von KI im Schulalltag, für Lehrpersonen der Zyklen 1 bis 3 (Deutschschweiz).
 
-Die Seite besteht aus 11 Stationen. Jede Station hat sechs Schritte: **Verstehen, Ausprobieren, Transfer, Verfeinern, Weiterdenken, Take-Home**. Die Stufe (Zyklus 1, 2 oder 3) wählen die Teilnehmenden pro Station selbst. Das Ergebnis, also eigene Prompts, Gedanken und Notizen, lässt sich am Ende als Textdatei speichern, kopieren oder drucken.
+Die Seite besteht aus 12 Stationen (11 Basisstationen und eine Vertiefung für Fortgeschrittene). Jede Station hat sechs Schritte: **Verstehen, Ausprobieren, Transfer, Verfeinern, Weiterdenken, Take-Home**. Die Stufe (Zyklus 1, 2 oder 3) wählen die Teilnehmenden pro Station selbst. Das Ergebnis, also eigene Prompts, Gedanken und Notizen, lässt sich am Ende als Textdatei speichern, kopieren oder drucken.
 
 ## Stationen
 
-Prompting · Elternarbeit · Differenzieren · Material umwandeln · Feedback · Beurteilung · Sparringspartner · Ideen & Kreativität · Unterrichtsvorbereitung · Halluzinationen & Quellen · KI & Schüler:innen
+Prompting · Elternarbeit · Differenzieren · Material umwandeln · Feedback · Beurteilung · Sparringspartner · Ideen & Kreativität · Unterrichtsvorbereitung · Halluzinationen & Quellen · KI & Schüler:innen · KI-robuste Aufgaben (Vertiefung)
 
 ## Verwenden
 
