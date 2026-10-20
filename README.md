@@ -27,4 +27,6 @@ Hinweise zu den Inhalten:
 
 © David Halser, Pädagogische Hochschule Graubünden (PHGR).
 
+Idee, Konzept und didaktische Entscheidungen: David Halser. Texte und Code sind in Zusammenarbeit mit Claude Code (KI von Anthropic) entstanden.
+
 Dieses Werk steht unter der Lizenz [Creative Commons Namensnennung – Weitergabe unter gleichen Bedingungen 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/deed.de). Du darfst es teilen und bearbeiten, auch kommerziell, wenn du den Urheber nennst und Veränderungen unter derselben Lizenz weitergibst. Der vollständige Lizenztext steht in der Datei `LICENSE`.
